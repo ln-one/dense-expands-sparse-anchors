@@ -1,0 +1,82 @@
+{
+  "anchorqe_alpha": 0.15,
+  "anchorqe_expansion_mixture": "uniform mean of five normalized E_query(reference_i) vectors",
+  "bootstrap": "10000 stratified query resamples; seed 20260813",
+  "dataset_aggregation": "equal-weight macro",
+  "datasets": [
+    "scifact",
+    "nfcorpus",
+    "trec-covid",
+    "fiqa",
+    "arguana",
+    "webis-touche2020",
+    "scidocs"
+  ],
+  "desa_contextual_mixture": "mean of five normalized E_query(query [SEP] reference_i) vectors",
+  "draw_aggregation": "mean within query",
+  "generation_sha256": {
+    "arguana": "5692cca8dc43de8ba5b25e7543eb952ef0ab20057dab811297a3f5fc2641c338",
+    "fiqa": "6d2bb2ffc3d061d2ea937a721b82722adcc70b64624e37a776d45032be4612a5",
+    "nfcorpus": "cbc51264b0be1b0f0c9cf52774017d8410ae1f1352383680d055a57dff1af98e",
+    "scidocs": "d3e6d1b0b2fede8e0951808f32325cd659a98ce2481ed11cf03767e6f86527ce",
+    "scifact": "c7115157391cac9b293b573ee9fb9417a51a21f247d810b8bddd850505c35483",
+    "trec-covid": "ad872fb2b0bbcfb66a1ffde44fda1f7aa239d8b64d95915c0af9897facf13b9d",
+    "webis-touche2020": "fedee8be5d672c360d5176c867aa2a4248418c7bebe63d81767661f84ddb8e32"
+  },
+  "methods": [
+    "original",
+    "anchorqe_fixed_015",
+    "anchorqe_sc_matched",
+    "desa_de"
+  ],
+  "paired_test": "stratified query-level sign flip; Holm over two metrics",
+  "paired_tests_sha256": "97d367351fa802ae5180721f1d74a17b4a73db4f0e64e634741216ad09cede45",
+  "query_expansion_reencode": "E_query(query [SEP] reference_1 ... [SEP] reference_5)",
+  "raw_results_sha256": "9c1fea1df2ee0bd1d4eefc8f8e7939a2ce1012d6102ae41bbe4b8d73655c1540",
+  "reference_count": 5,
+  "schema_version": 1,
+  "stream_calibration": {
+    "alphas": {
+      "arguana": {
+        "0": 0.1990279594388247,
+        "1": 0.20106281781476565,
+        "2": 0.19743968882903967
+      },
+      "fiqa": {
+        "0": 0.22827022522086546,
+        "1": 0.23446641013781322,
+        "2": 0.23201212868453544
+      },
+      "nfcorpus": {
+        "0": 0.24330094632976537,
+        "1": 0.24413530049442714,
+        "2": 0.23959708885058062
+      },
+      "scidocs": {
+        "0": 0.2273365172766614,
+        "1": 0.22922564048296853,
+        "2": 0.22575487127131738
+      },
+      "scifact": {
+        "0": 0.24142814215046293,
+        "1": 0.24161173780654704,
+        "2": 0.24149132532307135
+      },
+      "trec-covid": {
+        "0": 0.20833935396261447,
+        "1": 0.20497218233782782,
+        "2": 0.21114183338585443
+      },
+      "webis-touche2020": {
+        "0": 0.2188758022341418,
+        "1": 0.21415511452725952,
+        "2": 0.22185745552951688
+      }
+    },
+    "calibration_queries": 8,
+    "note": "matched five-reference mixture adaptation of SC-AnchorQE; the source paper calibrates one expansion per query",
+    "scope": "independent per dataset and draw",
+    "split": "first unique queries in stored generation order"
+  },
+  "summary_sha256": "dd4e35a3b814d4a92d34d6c7429c90bb499516ad0d28e32d161560fd5c6bf732"
+}

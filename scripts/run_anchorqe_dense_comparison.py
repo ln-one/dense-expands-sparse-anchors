@@ -41,7 +41,14 @@ METHODS = (
     "anchorqe_fixed_015",
     "desa_de",
 )
+SC_METHODS = (
+    "original",
+    "anchorqe_fixed_015",
+    "anchorqe_sc_matched",
+    "desa_de",
+)
 ALPHA = 0.15
+CALIBRATION_QUERIES = 8
 REFERENCE_COUNT = 5
 
 
@@ -111,6 +118,43 @@ def exact_top_k(
     return rankings
 
 
+def stream_calibrated_alpha(
+    document_embeddings: np.ndarray[Any, np.dtype[np.float32]],
+    original_vectors: np.ndarray[Any, np.dtype[np.float32]],
+    expansion_mixtures: np.ndarray[Any, np.dtype[np.float32]],
+    *,
+    support_k: int = 10,
+) -> float:
+    """Apply AnchorQE's label-free stream calibration to matched mixtures."""
+    query_scores = np.asarray(document_embeddings @ original_vectors.T, dtype=np.float32)
+    expansion_scores = np.asarray(
+        document_embeddings @ expansion_mixtures.T, dtype=np.float32
+    )
+    query_top = np.max(query_scores, axis=0)
+    expansion_top = np.max(expansion_scores, axis=0)
+    query_support: list[float] = []
+    expansion_support: list[float] = []
+    for column in range(query_scores.shape[1]):
+        indices = np.argpartition(query_scores[:, column], -support_k)[-support_k:]
+        query_support.append(float(np.mean(query_scores[indices, column])))
+        expansion_support.append(float(np.mean(expansion_scores[indices, column])))
+
+    def positive_mean(values: object) -> float:
+        return float(np.mean(np.maximum(np.asarray(values, dtype=np.float32), 0.0)))
+
+    query_top_mean = positive_mean(query_top)
+    expansion_top_mean = positive_mean(expansion_top)
+    query_support_mean = positive_mean(query_support)
+    expansion_support_mean = positive_mean(expansion_support)
+    top_denominator = query_top_mean + expansion_top_mean
+    support_denominator = query_support_mean + expansion_support_mean
+    if top_denominator == 0.0 or support_denominator == 0.0:
+        return 0.0
+    return (expansion_top_mean / top_denominator) * (
+        expansion_support_mean / support_denominator
+    )
+
+
 def metric_row(
     dataset: str,
     query_id: str,
@@ -138,7 +182,8 @@ def run_dataset(
     *,
     encode_batch_size: int,
     score_batch_size: int,
-) -> list[dict[str, object]]:
+    stream_calibrated: bool,
+) -> tuple[list[dict[str, object]], dict[int, float]]:
     records = [
         row
         for row in read_jsonl(
@@ -146,6 +191,8 @@ def run_dataset(
         )
         if row["status"] == "ok" and len(row["parsed_references"]) >= REFERENCE_COUNT
     ]
+    natural_query_ids = list(dict.fromkeys(str(row["query_id"]) for row in records))
+    calibration_query_ids = set(natural_query_ids[:CALIBRATION_QUERIES])
     records.sort(key=lambda row: (str(row["query_id"]), int(row["draw_id"])))
     query_texts = {str(row["query_id"]): str(row["query_text"]) for row in records}
     query_ids = sorted(query_texts)
@@ -162,12 +209,15 @@ def run_dataset(
         query = str(row["query_text"])
         references = [str(item) for item in row["parsed_references"][:REFERENCE_COUNT]]
         expansion_texts.extend(references)
-        combined_texts.append(" [SEP] ".join([query, *references]))
+        if not stream_calibrated:
+            combined_texts.append(" [SEP] ".join([query, *references]))
     expansion_stream_vectors = encoder.encode_queries(
         expansion_texts, instruction, batch_size=encode_batch_size
     ).reshape(len(records), REFERENCE_COUNT, -1)
-    combined_vectors = encoder.encode_queries(
-        combined_texts, instruction, batch_size=encode_batch_size
+    combined_vectors = (
+        encoder.encode_queries(combined_texts, instruction, batch_size=encode_batch_size)
+        if combined_texts
+        else np.empty((0, original_matrix.shape[1]), dtype=np.float32)
     )
 
     anchor_vectors = np.stack(
@@ -176,14 +226,12 @@ def run_dataset(
             for row, vectors in zip(records, expansion_stream_vectors, strict=True)
         ]
     )
+    expansion_mixtures = np.mean(expansion_stream_vectors, axis=1, dtype=np.float32)
     expansion_vectors = np.stack(
         [
-            l2_normalize(np.mean(vectors, axis=0, dtype=np.float32))
-            for vectors in expansion_stream_vectors
+            l2_normalize(mixture)
+            for mixture in expansion_mixtures
         ]
-    )
-    candidate_vectors = np.concatenate(
-        [expansion_vectors, combined_vectors, anchor_vectors], axis=0
     )
 
     dense_cache = (
@@ -200,6 +248,44 @@ def run_dataset(
     document_embeddings = np.load(
         dense_cache / "document_embeddings.npy", mmap_mode="r"
     )
+
+    calibration: dict[int, float] = {}
+    sc_vectors: list[np.ndarray[Any, np.dtype[np.float32]]] = []
+    if stream_calibrated:
+        for draw_id in sorted({int(row["draw_id"]) for row in records}):
+            indices = [
+                index
+                for index, row in enumerate(records)
+                if int(row["draw_id"]) == draw_id
+                and str(row["query_id"]) in calibration_query_ids
+            ]
+            if len(indices) != CALIBRATION_QUERIES:
+                raise RuntimeError(
+                    f"{dataset} draw {draw_id}: expected {CALIBRATION_QUERIES} "
+                    f"calibration queries, found {len(indices)}"
+                )
+            calibration[draw_id] = stream_calibrated_alpha(
+                document_embeddings,
+                np.stack(
+                    [original_by_query[str(records[index]["query_id"])] for index in indices]
+                ),
+                expansion_mixtures[indices],
+            )
+        sc_vectors = [
+            fixed_anchor_qe(
+                original_by_query[str(row["query_id"])],
+                vectors,
+                calibration[int(row["draw_id"])],
+            )
+            for row, vectors in zip(records, expansion_stream_vectors, strict=True)
+        ]
+
+    candidate_parts = [anchor_vectors]
+    if stream_calibrated:
+        candidate_parts.append(np.stack(sc_vectors))
+    else:
+        candidate_parts[0:0] = [expansion_vectors, combined_vectors]
+    candidate_vectors = np.concatenate(candidate_parts, axis=0)
     new_rankings = exact_top_k(
         document_ids,
         document_embeddings,
@@ -207,9 +293,16 @@ def run_dataset(
         batch_size=score_batch_size,
     )
     count = len(records)
-    expansion_rankings = new_rankings[:count]
-    combined_rankings = new_rankings[count : 2 * count]
-    anchor_rankings = new_rankings[2 * count :]
+    if stream_calibrated:
+        anchor_rankings = new_rankings[:count]
+        sc_rankings = new_rankings[count:]
+        expansion_rankings: list[list[str]] = []
+        combined_rankings: list[list[str]] = []
+    else:
+        expansion_rankings = new_rankings[:count]
+        combined_rankings = new_rankings[count : 2 * count]
+        anchor_rankings = new_rankings[2 * count :]
+        sc_rankings = []
 
     qrels = load_qrels(root / "data" / "processed" / dataset / "qrels.tsv")
     store = StoredTopK(
@@ -221,14 +314,14 @@ def run_dataset(
         for index, row in enumerate(records):
             query_id = str(row["query_id"])
             draw_id = int(row["draw_id"])
+            if stream_calibrated and query_id in calibration_query_ids:
+                continue
             if query_id not in original_cache:
                 original_cache[query_id] = store.get(
                     query_id, 0, "base", "dense_original", 0
                 )
-            rankings = {
+            rankings: dict[str, list[str]] = {
                 "original": original_cache[query_id],
-                "expansion_only": expansion_rankings[index],
-                "query_expansion_reencode": combined_rankings[index],
                 "anchorqe_fixed_015": anchor_rankings[index],
                 "desa_de": store.get(
                     query_id,
@@ -238,6 +331,13 @@ def run_dataset(
                     REFERENCE_COUNT,
                 ),
             }
+            if stream_calibrated:
+                rankings["anchorqe_sc_matched"] = sc_rankings[index]
+                methods = SC_METHODS
+            else:
+                rankings["expansion_only"] = expansion_rankings[index]
+                rankings["query_expansion_reencode"] = combined_rankings[index]
+                methods = METHODS
             rows.extend(
                 metric_row(
                     dataset,
@@ -247,11 +347,11 @@ def run_dataset(
                     rankings[method],
                     qrels[query_id],
                 )
-                for method in METHODS
+                for method in methods
             )
     finally:
         store.close()
-    return rows
+    return rows, calibration
 
 
 def summarize(frame: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
@@ -280,7 +380,9 @@ def summarize(frame: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
     return query_means, summary
 
 
-def paired_tests(query_means: pd.DataFrame) -> pd.DataFrame:
+def paired_tests(
+    query_means: pd.DataFrame, left: str = "desa_de", right: str = "anchorqe_fixed_015"
+) -> pd.DataFrame:
     tests: list[dict[str, object]] = []
     raw_pvalues: dict[str, float] = {}
     for metric in ("ndcg_at_10", "recall_at_20"):
@@ -288,7 +390,7 @@ def paired_tests(query_means: pd.DataFrame) -> pd.DataFrame:
             index=["dataset", "query_id"], columns="method", values=metric
         )
         differences = {
-            str(dataset): group["desa_de"].sub(group["anchorqe_fixed_015"]).tolist()
+            str(dataset): group[left].sub(group[right]).tolist()
             for dataset, group in wide.groupby(level="dataset")
         }
         estimate, lower, upper = stratified_macro_bootstrap(differences)
@@ -296,7 +398,7 @@ def paired_tests(query_means: pd.DataFrame) -> pd.DataFrame:
         raw_pvalues[metric] = pvalue
         tests.append(
             {
-                "comparison": "desa_de-anchorqe_fixed_015",
+                "comparison": f"{left}-{right}",
                 "metric": metric,
                 "macro_difference": estimate,
                 "ci95_lower": lower,
@@ -315,6 +417,7 @@ def main() -> None:
     parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[1])
     parser.add_argument("--encode-batch-size", type=int, default=128)
     parser.add_argument("--score-batch-size", type=int, default=24)
+    parser.add_argument("--stream-calibrated", action="store_true")
     args = parser.parse_args()
     root = args.root.resolve()
     retrievers = yaml.safe_load(
@@ -327,10 +430,10 @@ def main() -> None:
     encoder = DenseEncoder(dense["model_id"], dense["revision"])
 
     rows: list[dict[str, object]] = []
+    calibration: dict[str, dict[int, float]] = {}
     for dataset in DATASETS:
         print(f"Running {dataset}...", flush=True)
-        rows.extend(
-            run_dataset(
+        dataset_rows, dataset_calibration = run_dataset(
                 root,
                 dataset,
                 encoder,
@@ -338,27 +441,56 @@ def main() -> None:
                 dense_cache_id,
                 encode_batch_size=args.encode_batch_size,
                 score_batch_size=args.score_batch_size,
+                stream_calibrated=args.stream_calibrated,
             )
-        )
+        rows.extend(dataset_rows)
+        calibration[dataset] = dataset_calibration
 
     report = root / "report"
     frame = pd.DataFrame(rows)
     query_means, summary = summarize(frame)
-    tests = paired_tests(query_means)
-    raw_path = report / "anchorqe-dense-results.csv"
-    summary_path = report / "anchorqe-dense-summary.csv"
-    tests_path = report / "anchorqe-dense-paired-tests.csv"
+    if args.stream_calibrated:
+        tests = pd.concat(
+            [
+                paired_tests(query_means, "desa_de", "anchorqe_sc_matched"),
+                paired_tests(query_means, "anchorqe_sc_matched", "anchorqe_fixed_015"),
+            ],
+            ignore_index=True,
+        )
+        prefix = "anchorqe-sc-dense"
+        methods = SC_METHODS
+    else:
+        tests = paired_tests(query_means)
+        prefix = "anchorqe-dense"
+        methods = METHODS
+    raw_path = report / f"{prefix}-results.csv"
+    summary_path = report / f"{prefix}-summary.csv"
+    tests_path = report / f"{prefix}-paired-tests.csv"
     frame.to_csv(raw_path, index=False)
     summary.to_csv(summary_path, index=False)
     tests.to_csv(tests_path, index=False)
     write_json(
-        report / "anchorqe-dense-manifest.json",
+        report / f"{prefix}-manifest.json",
         {
             "schema_version": 1,
             "datasets": list(DATASETS),
-            "methods": list(METHODS),
+            "methods": list(methods),
             "reference_count": REFERENCE_COUNT,
             "anchorqe_alpha": ALPHA,
+            "stream_calibration": (
+                {
+                    "calibration_queries": CALIBRATION_QUERIES,
+                    "split": "first unique queries in stored generation order",
+                    "scope": "independent per dataset and draw",
+                    "alphas": calibration,
+                    "note": (
+                        "matched five-reference mixture adaptation of SC-AnchorQE; "
+                        "the source paper calibrates one expansion per query"
+                    ),
+                }
+                if args.stream_calibrated
+                else None
+            ),
             "anchorqe_expansion_mixture": (
                 "uniform mean of five normalized E_query(reference_i) vectors"
             ),
