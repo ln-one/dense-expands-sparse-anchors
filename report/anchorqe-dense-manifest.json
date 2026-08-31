@@ -1,0 +1,40 @@
+{
+  "anchorqe_alpha": 0.15,
+  "anchorqe_expansion_mixture": "uniform mean of five normalized E_query(reference_i) vectors",
+  "bootstrap": "10000 stratified query resamples; seed 20260813",
+  "dataset_aggregation": "equal-weight macro",
+  "datasets": [
+    "scifact",
+    "nfcorpus",
+    "trec-covid",
+    "fiqa",
+    "arguana",
+    "webis-touche2020",
+    "scidocs"
+  ],
+  "desa_contextual_mixture": "mean of five normalized E_query(query [SEP] reference_i) vectors",
+  "draw_aggregation": "mean within query",
+  "generation_sha256": {
+    "arguana": "5692cca8dc43de8ba5b25e7543eb952ef0ab20057dab811297a3f5fc2641c338",
+    "fiqa": "6d2bb2ffc3d061d2ea937a721b82722adcc70b64624e37a776d45032be4612a5",
+    "nfcorpus": "cbc51264b0be1b0f0c9cf52774017d8410ae1f1352383680d055a57dff1af98e",
+    "scidocs": "d3e6d1b0b2fede8e0951808f32325cd659a98ce2481ed11cf03767e6f86527ce",
+    "scifact": "c7115157391cac9b293b573ee9fb9417a51a21f247d810b8bddd850505c35483",
+    "trec-covid": "ad872fb2b0bbcfb66a1ffde44fda1f7aa239d8b64d95915c0af9897facf13b9d",
+    "webis-touche2020": "fedee8be5d672c360d5176c867aa2a4248418c7bebe63d81767661f84ddb8e32"
+  },
+  "methods": [
+    "original",
+    "expansion_only",
+    "query_expansion_reencode",
+    "anchorqe_fixed_015",
+    "desa_de"
+  ],
+  "paired_test": "stratified query-level sign flip; Holm over two metrics",
+  "paired_tests_sha256": "43c2706c6aea54275caeb233911158ff3e42290b9ee77afb3051aadb0cc0e813",
+  "query_expansion_reencode": "E_query(query [SEP] reference_1 ... [SEP] reference_5)",
+  "raw_results_sha256": "56ed8500b32c0486aa21d5780d57062cd658fba9d0379f2f59349fb6578c72dd",
+  "reference_count": 5,
+  "schema_version": 1,
+  "summary_sha256": "45452200ae405a6225a177b3478e28159c90e705cc9cafedddbf405d56fe4529"
+}

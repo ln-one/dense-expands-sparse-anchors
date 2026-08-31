@@ -4,6 +4,7 @@ from hybrid_query_construction.fusion import rank_scores
 from hybrid_query_construction.mechanism import dense_geometry, sparse_reordering
 from hybrid_query_construction.methods import (
     contextual_mean,
+    fixed_anchor_qe,
     mugi_sparse_rewrite,
     orthogonal_residual,
     sparse_score_product,
@@ -38,6 +39,14 @@ def test_orthogonal_residual_stays_within_45_degrees_for_unit_inputs() -> None:
     result = orthogonal_residual(original, references)
     cosine = float(np.dot(result, original))
     assert cosine >= (1.0 / np.sqrt(2.0)) - 1e-6
+
+
+def test_fixed_anchor_qe_uses_paper_default_interpolation() -> None:
+    original = np.asarray([1.0, 0.0], dtype=np.float32)
+    references = [np.asarray([0.0, 1.0], dtype=np.float32)]
+    expected = np.asarray([0.85, 0.15], dtype=np.float32)
+    expected /= np.linalg.norm(expected)
+    np.testing.assert_allclose(fixed_anchor_qe(original, references), expected, atol=1e-6)
 
 
 def test_sparse_product_has_intersection_support() -> None:

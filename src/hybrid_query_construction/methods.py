@@ -32,6 +32,23 @@ def orthogonal_residual(
     return l2_normalize(np.asarray(original + residual, dtype=np.float32))
 
 
+def fixed_anchor_qe(
+    original_vector: FloatArray,
+    contextual_reference_vectors: Sequence[FloatArray],
+    alpha: float = 0.15,
+) -> FloatArray:
+    """Interpolate the original query and contextual expansion centroid."""
+    if not 0.0 <= alpha <= 1.0:
+        raise ValueError("alpha must be between zero and one")
+    original = l2_normalize(original_vector)
+    expansion_mean = np.mean(
+        np.stack(contextual_reference_vectors), axis=0, dtype=np.float32
+    )
+    return l2_normalize(
+        np.asarray((1.0 - alpha) * original + alpha * expansion_mean, dtype=np.float32)
+    )
+
+
 def reference_mean(reference_vectors: Sequence[FloatArray]) -> FloatArray:
     return contextual_mean(reference_vectors)
 
