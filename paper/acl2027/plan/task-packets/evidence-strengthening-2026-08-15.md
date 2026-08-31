@@ -21,7 +21,7 @@
   4. manuscript updates only for results backed by generated artifacts.
 - Rejection checks: no development/held-out split; no mock numbers; no claim of
   superiority without a matched experiment; no replacement of historical raw
-  artifacts; no silent change to WRRF or generation settings.
+  artifacts; no silent change to RRF or generation settings.
 - Validation commands: unit tests for changed code, deterministic report
   regeneration, numeric cross-checks against source CSVs, anonymous/public
   LaTeX builds, log checks, rendered-page inspection, and `git diff --check`.

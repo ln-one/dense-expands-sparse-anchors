@@ -76,9 +76,8 @@ MuGI's repetition coefficient.
 
 \subsection{Baseline Reproduction}
 
-All generative baselines use the same primary generator. Exact prompts and the
-reproduction code are available at
-\url{https://github.com/ln-one/dense-expands-sparse-anchors}.
+All generative baselines use the same primary generator. Their generation and
+query-integration settings are specified below.
 
 HyDE generates eight hypothetical documents per run and averages their
 normalized representations; its sparse channel uses the original query. FiQA,
@@ -120,9 +119,9 @@ retrieval or fusion scores are ordered by the UTF-8 order of their identifiers.
 
 \subsection{Access-Depth Replay}
 
-This implements the fixed bound-based replay protocol adopted in
-Section~\ref{sec:quality-access} from \citet{zhang2026exact}. The replay starts
-with empty dense and sparse prefixes. After reading $l_c$
+This section gives implementation details for the bound-based replay defined
+in Section~\ref{sec:quality-access}. The replay starts with empty dense and
+sparse prefixes. After reading $l_c$
 items from channel $c$, its next unread contribution is bounded by
 
 \[
@@ -270,9 +269,10 @@ gains and reductions remain positive but non-monotonic.
 
 \subsection{Matched Operator and QuDAR Controls}
 
-Tables~\ref{tab:operator-controls} and~\ref{tab:qudar-matched} report matched
-controls. Operator pairs share references, keep the other channel at Original,
-and average three draws within query before inference.
+Table~\ref{tab:operator-controls} reports matched operator controls. Operator
+pairs share references, keep the other channel at Original, and average three
+draws within query before inference. The QuDAR control uses the same generated
+references as DESA and complete-list RRF over OS, OD, ES, and ED.
 
 \begin{table*}[!t]
 \centering
@@ -386,30 +386,20 @@ correction covers nDCG and Recall within each control pair.}
 \label{tab:operator-controls}
 \end{table}
 
-\begin{table}[H]
-\centering
-\scriptsize
-\setlength{\tabcolsep}{2.9pt}
-\begin{tabular}{lrrrr}
-\toprule
-Dataset & \multicolumn{2}{c}{nDCG@10} & \multicolumn{2}{c}{Recall@20} \\
- & DESA & QuDAR & DESA & QuDAR \\
-\midrule
-ArguAna        & .3991 & .3985 & .9237 & .9253 \\
-FiQA           & .3780 & .3833 & .5450 & .5554 \\
-NFCorpus       & .3793 & .3780 & .2195 & .2227 \\
-SCIDOCS        & .1940 & .1957 & .2787 & .2811 \\
-SciFact        & .7427 & .7403 & .9200 & .9211 \\
-TREC-COVID     & .8224 & .8233 & .0435 & .0438 \\
-Touch\'e-2020 & .4071 & .4137 & .3560 & .3500 \\
-\midrule
-Equal-dataset macro & .4747 & .4761 & .4695 & .4714 \\
-\bottomrule
-\end{tabular}
-\caption{Matched-reference comparison with QuDAR-simple RRF (top-1000
-original-sparse (OS), expanded-sparse (ES), original-dense (OD), and
-expanded-dense (ED) rankings; $k=60$). DESA--QuDAR paired effects are $-.00145$
-[$-.00478,.00181$] for nDCG and $-.00188$ [$-.00400,.00019$] for Recall
-($p_{\mathrm{Holm}}=.3966$ and $.1668$).}
-\label{tab:qudar-matched}
-\end{table}
+Against complete uniform QuDAR, DESA's paired effects are $-.00132$
+[$-.00470,.00194$] for nDCG and $-.00174$ [$-.00382,.00033$] for Recall
+($p_{\mathrm{Holm}}=.4393$ and $.2140$), while reducing total certification
+depth by 74.41\% [67.27\%, 80.89\%] ($p_{\mathrm{Holm}}=.0002$).
+
+\begingroup\footnotesize
+\noindent\textbf{Confidence-weighting audit.}
+Replacing QuDAR's margin weights with $w_c=.25$ while holding its inputs fixed
+yields no significant nDCG/Recall difference
+($p_{\mathrm{Holm}}=.1182/.5826$); 92.14\%/99.04\% of pooled query--draw
+outcomes are unchanged, with dataset means in .2325--.2699. In a
+complete-list RRF diagnostic, the weights lower nDCG by .00117
+($p_{\mathrm{Holm}}=.0104$), leave Recall unchanged
+($p_{\mathrm{Holm}}=.4312$), and raise depth from 5478.4 to 5601.4. Neither
+test shows an independent benefit in this setting; the unofficial RRF transfer
+does not assess LLM weighting or QuDAR overall.
+\endgroup

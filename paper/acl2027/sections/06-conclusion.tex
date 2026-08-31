@@ -1,29 +1,26 @@
 \section{Conclusion}
 \label{sec:conclusion}
 
-This work shows that query expansion in hybrid retrieval should account for
-the distinct matching behavior of dense and sparse retrieval channels. DESA implements
-this channel-asymmetric view using a shared set of generated reference
-passages. Orthogonal residual expansion adds complementary semantic directions
-to the dense query, whereas score-product anchoring uses the same generated
-passages to reorder documents within the original sparse support. To evaluate this design
-without tying its measured effect to a fixed top-$L$ cutoff, we determine the
-fused ranking from complete channel lists and record the per-channel replay
-stopping depths needed to certify its ordered top-$K$.
+This work frames hybrid query expansion as a coupled construction problem for
+the fused result. A fixed top-$L$ cutoff entangles expansion effects with the
+prefixes used for fusion, so we separate complete-list effectiveness from the
+per-channel depths needed to certify the same top-$K$. DESA designs both
+channels for this joint objective using shared generated references with
+channel-specific evidence authority: orthogonal residual expansion adds new
+dense semantic directions, while score-product anchoring reorders only the
+original sparse support.
 
 Across seven BEIR datasets, DESA improves equal-dataset macro nDCG@10 and
 Recall@20 over Original by 3.82\% and 2.38\%, while reducing dense and sparse
-replay stopping depths by 36.90\% and 36.56\%. The operator analysis clarifies the source
-of these gains: sparse anchoring provides the more consistent effectiveness
-improvement, and dense residual expansion contributes additional gains while
-reducing the ranked evidence required for fusion. Under matched generated
-references, paired tests do not detect a statistically significant
-effectiveness difference between DESA and QuDAR-simple RRF. Comparing their
-equal-dataset mean entry counts, DESA uses 64.16\% fewer available fusion-side
-rank entries.
+replay stopping depths by 36.90\% and 36.56\%. Under matched generated
+references, it also provides a significant nDCG advantage over Shared expansion
+and preserves the original sparse support. Against a matched complete-list
+four-signal QuDAR control, the effectiveness difference is statistically
+unresolved, while DESA requires 74.41\% less total certification depth. Sparse
+anchoring supplies the more consistent effectiveness gains, while dense
+expansion contributes additional gains on most datasets; matched controls do
+not establish either exact operator as uniquely optimal.
 
-Together, these findings point to a division of labor for query expansion in
-hybrid retrieval. Generated reference passages broaden semantic coverage in dense
-retrieval and, when anchored to the original query, improve ordering in sparse
-retrieval without broadening lexical support. This division of labor captures
-the central design principle of DESA: Dense expands, while Sparse anchors.
+Because the fused target depends jointly on both rankings, generated evidence
+must be coordinated across them. It may extend dense semantics without
+acquiring independent sparse admission authority: Dense expands; Sparse anchors.

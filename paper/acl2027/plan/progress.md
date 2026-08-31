@@ -2,7 +2,7 @@
 
 ## Current stage
 
-Stage S2/S6: Method-property formalization within public preprint readiness. The public
+Stage S5: public-preprint manuscript verified after the post-held-out complete-list QuDAR revision. The public
 preprint is the immediate release target; the anonymous ACL review build is
 maintained from the same source but is not the current submission priority.
 
@@ -12,10 +12,19 @@ is ready for paragraph-level author review. The approved Chinese Conclusion
 has been translated, reviewed, and added to the ACL draft. The abstract now
 includes the frozen primary findings and observed access boundary.
 The title and method name are locked as `Dense Expands, Sparse Anchors:
-Channel-Asymmetric Query Expansion for Hybrid Retrieval` and DESA (Dense
-Expansion and Sparse Anchoring).
+Coordinated Query Expansion` and DESA (Dense Expansion and Sparse Anchoring).
 The manuscript now has a shared-source public arXiv build with the author's
 name, affiliation, location, and contact email; the ACL build remains anonymous.
+
+The complete-list QuDAR quality results were regenerated with stable summation;
+four-channel certification depths now have paired uncertainty; and Experiments,
+Results, Conclusion, Appendix, and Limitations are synchronized to this
+supplemental comparison.
+
+Sections 4 and 5 have also received a holistic compression pass. The experiment
+protocol now introduces each comparison once, and the Results section answers
+the cutoff, primary, mechanism, external-comparison, and robustness questions
+without repeating table contents or claim boundaries.
 
 ## Status
 
@@ -92,7 +101,7 @@ name, affiliation, location, and contact email; the ACL build remains anonymous.
   four-dataset analyses are explicitly the common prior-method subset and the
   sampled Mistral/Contriever robustness subset.
 - Numerical audit: mechanism access reductions now match
-  `report/access-macro-bootstrap.csv`: Dense-only 8.16\%/7.49\%, Sparse-only
+  `report/access-macro-bootstrap.csv`: Dense only 8.16\%/7.49\%, Sparse only
   28.77\%/27.74\%, and DESA 36.90\%/36.56\% for Dense/Sparse.
 - Method-property verification: the Dense bound was checked against normalized
   production embeddings, and dedicated tests cover the $45^\circ$ angle bound,
@@ -176,9 +185,11 @@ name, affiliation, location, and contact email; the ACL build remains anonymous.
   draws within query, use equal-dataset stratified bootstrap/sign-flip
   inference, and apply Holm correction across nDCG and Recall per comparison.
 - Claim audit: fixed-$L$ motivation is now supported by query-level conclusion
-  changes; neither operator is claimed independently dominant; DESA is
-  described as statistically comparable to QuDAR-simple, with 64.95% lower
-  fusion-side rank-entry access rather than lower end-to-end latency.
+  changes; neither operator is claimed independently dominant; paired tests do
+  not detect a statistically significant effectiveness difference from
+  QuDAR-simple. Accounting for finite sparse lists, the equal-dataset mean
+  entry counts imply 64.16% fewer available DESA fusion-side rank entries,
+  without claiming lower end-to-end latency.
 - Verification: evidence reports were regenerated twice with stable artifact
   hashes; 53 tests passed; Ruff passed for `src`, `scripts`, and `tests`;
   `git diff --check` passed; both anonymous and public LaTeX builds completed
@@ -211,6 +222,39 @@ name, affiliation, location, and contact email; the ACL build remains anonymous.
 - Remaining risk: the compact section positions the main recent integration
   methods but does not attempt a comprehensive history of classical query
   expansion.
+
+### Capability-use audit: seven-dataset reporting cleanup, 2026-08-16
+
+- Stage: S3 results synchronization and S5 preprint verification.
+- Required skills: research-writing workflow, paper orchestration,
+  experiment/results planning, LaTeX output, PDF inspection, and verification.
+- Skills actually used: research-writing workflow, paper orchestration,
+  experiment/results planning, LaTeX output, PDF inspection, and verification.
+- Inputs consumed: the immutable pre-evaluation lock, the original frozen
+  protocol, seven-dataset controlled and fidelity records, current manuscript,
+  and GitHub repository metadata.
+- Inputs not used: no new generation, retrieval, relevance judgment, or
+  per-query result was created because the change concerns reporting scope and
+  provenance rather than experimental evidence.
+- Artifacts produced: a versioned post-evaluation seven-dataset reporting
+  protocol, seven-dataset fidelity summaries, synchronized English and Chinese
+  Results text, a provenance-qualified Figure 1 caption, explicit EAHR replay
+  attribution, a repository URL, and an explained mechanism-diagnostic fallback.
+- Claim boundary: all seven datasets are reported as one pooled evaluation set;
+  the manuscript does not describe that pooled analysis as prespecified,
+  preregistered, held-out, or confirmatory. The historical access-control split
+  remains intact in the immutable pre-evaluation provenance record.
+- Verification run: report regeneration from frozen records, lock verification,
+  repository tests and lint, anonymous/public LaTeX builds, PDF text/layout
+  checks, scoped numerical recomputation, repository-visibility check, and
+  `git diff --check`.
+- Remaining risk: the Figure 1 display text remains abridged/paraphrased rather
+  than verbatim, but this is now disclosed in its caption. The GitHub URL in the
+  manuscript still resolves to a private repository as of the final local
+  check, so the author must make it public before completing the arXiv upload.
+  AI-use disclosure is intentionally deferred by the author for the arXiv
+  preprint and must be reconsidered under the policy of any later conference
+  submission.
 
 ### Method chapter review, 2026-08-16
 
@@ -449,3 +493,225 @@ name, affiliation, location, and contact email; the ACL build remains anonymous.
   arXiv builds compile to 14 pages with no LaTeX errors, undefined references,
   or overfull boxes. Page 8 was rendered and visually checked: the unnumbered
   heading, two paragraphs, and adjacent References column fit cleanly.
+
+### Figure candidate pool, 2026-08-16
+
+- Stage: S3 Results presentation and S5 figure review.
+- The preceding manuscript revision was committed as `a0af544` before this
+  exploratory work began. No candidate figure has been inserted into the
+  manuscript.
+- Literature design inputs: QuDAR's question--setting--observation figure
+  logic; Weller et al.'s cross-dataset relationship and failure-distribution
+  plots; Query2doc's scale-response figure; and MuGI's reference-count
+  sensitivity framing.
+- Required skills: research-writing workflow, paper orchestration,
+  experiment-results planning, publication figure design, Python plotting,
+  and completion verification. All were used; no subagent was used because the
+  author did not request delegation.
+- Artifacts produced: seven single-column candidates, one double-column
+  mechanism-to-outcome candidate, a contact sheet, editable SVG/PDF/PNG
+  exports, seven source-data snapshots, a persistent task packet, an argument
+  review, and a separate evidence/layout QA review.
+- Main-text shortlist: H for a double-column evidence story, B for one
+  standalone single-column result, A for channel-role evidence, and C for the
+  query-level distribution. D, G, E, and F are appendix or reserve candidates.
+- Evidence audit: FiQA's negative Dense only result is retained; all seven
+  controlled datasets remain positive in the joint quality--access plot; the
+  query-level both-shallower result reconstructs to 63.31%; and the sole
+  robustness access failure remains Contriever on Touch\'e-2020.
+- Visual audit: every candidate was inspected at its intended width; stray log
+  ticks, label collisions, quadrant shading, and the RRF ideal-region cue were
+  corrected. All SVG files retain editable text nodes.
+- Verification: consecutive regenerations produced identical PNG and data
+  hashes; Ruff and Python compilation passed; all expected exports and data
+  snapshots exist; claim assertions and `git diff --check` passed.
+- Remaining decision: choose one narrative package before any manuscript
+  write-back. H replaces A and B rather than accompanying them.
+## 2026-08-16 - Appendix organization and preprint readiness
+
+- **Stage**: S5 Review / submission preparation.
+- **Status**: In progress.
+- **Scope**: Reorder and tighten the appendix, verify the anonymous and public
+  builds, and prepare a source package for author-approved preprint upload.
+- **Boundary**: The rejected exploratory candidate figures remain outside the
+  manuscript; no external submission is authorized in this task.
+- **Task packet**:
+  `plan/task-packets/appendix-preprint-readiness-2026-08-16.md`.
+- **Status**: Complete for local preprint preparation; external upload remains
+  author-controlled.
+- Reorganized the appendix into reproducibility details, operator diagnostics,
+  and additional experimental results. Removed the low-information binned
+  mechanism figure, regrouped cutoff and matched-control tables, and tightened
+  the robustness summary without changing any reported result.
+- Added a reproducible preprint packaging target and arXiv `00README.json`.
+  The archive contains only the source, styles, bibliography/BBL, sections, and
+  four figures required by the public build.
+- Verification: anonymous and public builds both compile to 14 A4 pages; final
+  logs contain no undefined citations/references, overfull boxes, duplicate
+  destinations, or LaTeX warnings. The archive compiles in a fresh temporary
+  directory, and its extracted PDF text is byte-identical to the project public
+  build. Appendix pages 9--14 were rendered and visually inspected.
+- Required skills: `using-research-writing`, `paper-orchestration`,
+  `writing-chapters`, `latex-output`, `peer-review`, `pdf`, and `verification`;
+  all were used. No subagent was used because this was one tightly coupled
+  appendix/build task.
+- Inputs consumed: manuscript sources, bibliography, build files, current PDFs,
+  existing planning records, and official arXiv TeX/README guidance. Rejected
+  candidate A--H figures were intentionally excluded; no preprint account or
+  external form was accessed because upload was not authorized.
+- Artifacts: revised appendix, public PDF, source archive and manifest, task
+  packet, and `plan/review/appendix-preprint-readiness-2026-08-16.md`.
+- Remaining decisions: arXiv category/cross-list, license, comments and journal
+  metadata, followed by visual inspection of arXiv's own compiled preview.
+
+## 2026-08-16 - Appendix layout, terminology, and citation audit
+
+- **Stage**: S1 evidence review / S5 submission review.
+- **Status**: Complete locally; external upload remains author-controlled.
+- **Scope**: Remove avoidable appendix white space, establish a sourced
+  ACL-aligned terminology lock, and review terminology and citations across the
+  complete manuscript in multiple passes.
+- **Task packet**:
+  `plan/task-packets/appendix-layout-terminology-citation-audit-2026-08-16.md`.
+- Appendix layout: removed float barriers and the redundant fixed-cutoff macro
+  table, consolidated the final result blocks, and reduced both builds from 14
+  to 13 pages. Final pages 12--13 have no empty body column, clipping, or text
+  overflow.
+- Terminology: aligned the manuscript with recent ACL-family usage for HyDE,
+  Query2doc, MuGI, Word2Passage, Exp4Fuse, MoR, and QuDAR. DESA consistently
+  uses generated/complementary reference passages; retrieval effectiveness,
+  access depth, and replay stopping depth remain distinct; RAG is reserved for
+  systems that include generation.
+- Citation audit: 27 cited keys and 27 bibliography entries, with no missing or
+  unused entries. DOI metadata was verified through Crossref when publisher
+  pages rejected automated access; citation placement and claim support were
+  reviewed separately from key closure.
+- Verification: anonymous/public builds and an isolated arXiv-package build all
+  pass with 13 pages; no overfull boxes, undefined citations/references,
+  duplicate labels, LaTeX/package/pdfTeX warnings, unembedded fonts, or PDF
+  placeholder markers. The isolated PDF text is identical to the project public
+  build.
+- Review artifacts:
+  `plan/review/appendix-layout-terminology-citation-spec-2026-08-16.md` and
+  `plan/review/appendix-layout-terminology-citation-quality-2026-08-16.md`.
+
+## 2026-08-16 - Two-round independent preprint audit
+
+- **Stage**: S5 final verification.
+- **Status**: Complete locally; no external upload performed.
+- Three independent read-only reviewers separately audited numerical claims,
+  terminology/citations, and LaTeX/layout/package behavior. After the first
+  fixes, all three repeated their assigned scope.
+- Corrected substantive low-level issues included the MuGI repetition formula,
+  HyDE category wording, C-Pack publication metadata, mixed access-percentage
+  aggregation, finite QuDAR list lengths, reference-count aggregation, and
+  overstrong wording for nonsignificant differences.
+- Corrected presentation issues included double-float placement, Matplotlib
+  font export, three bibliography case protections, undefined QuDAR
+  abbreviations, and baseline-label consistency.
+- Final anonymous and public PDFs contain 13 A4 pages. Both final logs are free
+  of overfull boxes, undefined citations/references, and LaTeX/package/pdfTeX
+  warnings. The rebuilt preprint archive compiles in isolation and its extracted
+  text matches the project public PDF.
+- Residual nonblocking preflight note: the Draw.io overview embeds one subsetted
+  Type 3 ZapfDingbats symbol; all other figure and document fonts are embedded,
+  and the Matplotlib outputs are CID TrueType.
+
+## 2026-08-17 - Repository-link placement
+
+- **Stage**: S5 final verification.
+- **Status**: Implemented locally.
+- Removed the public GitHub URL from the shared manuscript body so that neither
+  the arXiv PDF nor the anonymous ACL build contains a repository link.
+- Retained the complete prompt and baseline reproduction settings in the
+  appendix; repository discovery will be handled through external metadata.
+
+## 2026-08-29 - Abstract revision v3
+
+- Rebuilt the abstract as one causal chain: RAG retrieval grounding, fixed
+  top-$L$ conditionality, effectiveness--depth separation, coordinated
+  dense--sparse construction, DESA, and controlled evidence.
+- Replaced the earlier parallel presentation of evaluation and method with the
+  joint-design insight that the fused result and both replay stopping depths
+  depend on the two rankings together.
+- Added the matched Shared nDCG result because it directly supports
+  channel-specific integration after shared generation.
+- Retained the Original-relative effectiveness/depth results and the matched
+  Shared nDCG and sparse-support comparison. The query-level dual-depth rate
+  and the encoder--dataset failure remain in Results and Limitations.
+- Derived the title phrase from the method's complementary channel roles rather
+  than using it as a detached final slogan.
+
+### Capability-use audit
+
+- Required skills: using-research-writing, writing-chapters, nature-writing,
+  writing-core, LaTeX output, verification.
+- Skills actually used: all required skills.
+- Inputs consumed: revised Introduction, Results, Conclusion, argument outline,
+  evidence map, terminology ledger, and current abstract.
+- Inputs not used and why: no new literature or raw logs were needed because
+  the abstract introduces no new claim or result.
+- Artifacts produced: revised abstract, task packet, and two-stage review.
+- Verification run: strict word count, `git diff --check`, arXiv build, LaTeX
+  warning scan, `pdfinfo`, PDF text check, and rendered-page inspection.
+- Remaining risk: the RAG opening is application motivation only; the paper
+  evaluates retrieval rather than end-to-end generation.
+
+## 2026-08-29 - Title and Introduction closure
+
+- Renamed the paper to *Dense Expands, Sparse Anchors: Coordinated Query
+  Expansion* to foreground cross-channel coordination while retaining the
+  query-expansion category.
+- Removed the matched-Shared sentence from the abstract for a cleaner
+  Original-relative result summary.
+- Replaced the repeated `Dense expands; Sparse anchors.` slogan in the
+  Introduction with a causal closing sentence that presents shared evidence as
+  the mechanism for coordinating the two channels.
+- Integrated the Figure 1 reference into that closing sentence instead of
+  leaving a standalone backward-reference sentence.
+- Verification: `make arxiv` succeeds; the generated PDF remains 13 pages.
+
+## 2026-08-29 - Related Work page closure
+
+- Compressed only the closing paragraph of Section 2.3, removing the repeated
+  coupled-system formulation while preserving its prior-work boundary and
+  DESA contrast.
+- Section 2.3 now ends at the bottom of page 2; Section 3 begins cleanly at the
+  top of page 3 without manual page-breaking commands.
+- Verification: `make arxiv` succeeds, the PDF remains 13 pages, and rendered
+  pages 2--3 confirm the intended boundary with no overflow or undefined
+  references.
+
+## 2026-08-29 - Evaluation-protocol attribution
+
+- Rephrased the main-text evaluation protocol as a self-contained description
+  of complete-list fusion and bound-based replay, with EAHR retained as a
+  parenthetical source rather than the grammatical subject.
+- Folded the common-protocol control into that sentence with `Across methods`,
+  removing the separate `DESA changes only query construction` statement.
+- Kept the explicit protocol attribution in the appendix, where provenance and
+  reproduction details belong.
+- Verification: `make arxiv` succeeds; the PDF remains 13 pages and the
+  Section 2/3 page boundary is unchanged.
+
+## 2026-08-29 - Fixed-prefix list typesetting
+
+- Replaced the unbreakable inline set of seven cutoff values with a prose-led,
+  line-breakable enumeration.
+- This removes the visibly stretched interword spacing in the narrow ACL
+  column without changing the evaluated depths or global template settings.
+- Verification: `make arxiv` succeeds, the PDF remains 13 pages, and rendered
+  page 4 confirms natural paragraph spacing.
+
+## 2026-08-30 - QuDAR confidence-weighting audit
+
+- Added direct confidence-versus-uniform tests for the official-style
+  Top-1000 score fusion and the diagnostic complete-list RRF transfer.
+- The appendix now reports no measurable score-fusion benefit from the margin
+  weights and a significant nDCG decrease under the RRF diagnostic, without
+  generalizing to LLM-based weighting or QuDAR overall.
+- Persisted the paired tests and query--draw outcome-stability report so every
+  appendix number is regenerated from frozen artifacts.
+- Verification: changed scripts pass Ruff; 14 targeted tests pass; anonymous
+  and public PDFs compile to 12 pages; the final appendix page is visually
+  balanced; `git diff --check` passes.

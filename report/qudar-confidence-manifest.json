@@ -1,0 +1,41 @@
+{
+  "confidence_tau": 2.0,
+  "confidence_topk": 10,
+  "dataset_artifacts_sha256": {
+    "arguana": "60964e5100b8bf5599f424c5964b6bc3d4ec1cae5eb26fa780ed0097f634a671",
+    "fiqa": "5fbb5bc30f1487ee5d5c04e068e36cc84376086f5a8a05240aa7149b53fbfa77",
+    "nfcorpus": "5351c88d4867e0967636debf8f49b79971892ad248806c7f9fd7060c967aeac9",
+    "scidocs": "4f1151fc8b42202d408d64805e5e07a7de12f9f53bf14a505afd4bd6cee84624",
+    "scifact": "8d6c0ab17072cc54fbe7ac36bcc98b1c59d04ce9ed1813a6193657abfef6dd29",
+    "trec-covid": "ec91b834f75f8bc730654afc284bd91c63a8c3f479d1552a08ed32ba7ff41ffc",
+    "webis-touche2020": "632cca5b666d041d196abbfddece4ac9a053f7b2f6bdc9a8666d580df6779644"
+  },
+  "datasets": [
+    "scifact",
+    "nfcorpus",
+    "trec-covid",
+    "fiqa",
+    "arguana",
+    "webis-touche2020",
+    "scidocs"
+  ],
+  "official_code_commit": "0702721e82799d0489850d3f94ac787da43436ad",
+  "ranking_store_sha256": {
+    "arguana": "77b1e7d54bbe4d72bb833554e734fd97e4acf6f30a3c94d5bf6d2672607e09de",
+    "fiqa": "3d4e72a6d090eb7c9c0fa57e2dd938be161947af5bee94a300d34101bd030ede",
+    "nfcorpus": "be8c65368b19fbec79192f68ed2b7db23a557289877e3f19c74d039bd1ec9594",
+    "scidocs": "dd7ff6a4364e4e7784d671e03971f73c00987d41efa415a20c41e8713021822e",
+    "scifact": "450cd3da5e02e0f6770b6a912814579f11429398b9fcd1edbac4722a985423f9",
+    "trec-covid": "58a9c718489c260a311ebd91f7fff058044be5cf953b40b2b8b89ec521722d78",
+    "webis-touche2020": "43a5f41a0fbdd7e3991d01c3fa90b9333d65942b56f0d91e613751292e580991"
+  },
+  "retrieval_depth_per_signal": 1000,
+  "schema_version": 1,
+  "signals": [
+    "OS",
+    "OD",
+    "ES",
+    "ED"
+  ],
+  "variant": "QuDAR-confidence matched"
+}

@@ -9,6 +9,7 @@
 | Generators | E25, E26 | covered |
 | nDCG metric | E27 | covered |
 | Query-wise dual-perspective adaptive retrieval | E28 | covered |
+| Complete-list target and per-channel certification-depth distinction | E32 | covered once in Methods; protocol defined self-containedly |
 | Limitations of current empirical scope | protocol plus E12, E20--E26 | covered |
 
 No source is used to claim an experimental result; all reported effects remain

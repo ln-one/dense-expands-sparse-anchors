@@ -1,14 +1,19 @@
 \section*{Limitations}
 
-Our evaluation covers seven English BEIR datasets, two generators, two
-dense encoders, BM25, and equal-weight RRF. The results may differ for other
-languages, learned sparse retrievers, or fusion rules. Score-product anchoring
-further assumes a non-negative sparse scoring function.
+Our evaluation covers seven English BEIR datasets, two generators, two dense
+encoders, BM25, equal-weight RRF, and an ordered top-20 target. Generalization
+to other languages, learned sparse retrievers, or fusion rules remains
+untested, and score-product anchoring assumes non-negative sparse scores.
 
-Replay stopping depth measures the ranked evidence needed to certify the fused
-top-$K$, rather than wall-clock latency. End-to-end efficiency also depends on
-generation, encoding, indexing, and the retrieval interface. Generated
-references may contain irrelevant or unsupported expressions, while pooled
-relevance judgments may omit relevant documents outside existing pools.
-Evaluating DESA with broader retrieval architectures and online incremental
-retrieval would clarify these remaining boundaries.
+Replay stopping depth counts ranked evidence under the fixed policy; it is not
+latency, compute, or physical index work. End-to-end behavior also depends on
+generation, encoding, indexing, and incremental ranking access. The matched
+QuDAR comparison extends the same replay principle to four rankings, but its
+total depth should still be interpreted only as policy-specific logical access.
+
+Sparse anchoring excludes expansion-only matches, which limits lexical drift
+but may suppress relevant documents reachable only through generated terms.
+Generated references and pooled judgments may also be unreliable or
+incomplete. Certification depth increases with Contriever on Touch\'e-2020,
+and scale effects are non-monotonic. Future work should test selective support
+relaxation and online ranked access.

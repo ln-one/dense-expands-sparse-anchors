@@ -1,48 +1,49 @@
 \section{Related Work}
 \label{sec:related-work}
 
+\subsection{Evaluating Expansion under Hybrid Fusion}
+
+Hybrid query-expansion studies commonly evaluate fused rankings constructed
+from fixed top-$L$ prefixes
+\citep{zhang-etal-2024-exploring-best,liu-zhang-2025-exp4fuse}. Here, $L$
+controls both how much of each ranking is accessed and which cross-channel
+contributions enter fusion, making the measured expansion effect conditional
+on the selected cutoff. We therefore separate the complete-list fusion target
+from the per-channel replay depths required to certify it. Applied to query
+expansion, this distinction reveals how query construction changes both the
+fused result and its certification depths.
+
 \subsection{LLM-Based Query Expansion}
 
-LLM-based query expansion supplements short queries with document-like
-language that may be absent from the original formulation. HyDE encodes a
-generated hypothetical document for dense retrieval, whereas Query2doc appends
-a pseudo-document to the query for sparse and dense retrieval
+LLMs can construct document-like expansions containing lexical and semantic
+evidence absent from the original query. HyDE encodes a generated hypothetical
+document for dense retrieval, whereas Query2doc appends a pseudo-document to
+the query for sparse and dense retrieval
 \citep{gao-etal-2023-precise,wang-etal-2023-query2doc}. Later methods generate
 different forms of evidence or sample multiple references to cover alternative
 expressions of the same information need
 \citep{jagerman-etal-2023-query-expansion,zhang-etal-2024-exploring-best}.
-Although generated text can supply useful lexical and semantic cues, its effect
-varies across queries, datasets, and retrievers, and irrelevant content may
-reduce retrieval effectiveness \citep{weller-etal-2024-generative}.
+Although generated text can provide useful retrieval cues, its effects vary
+across queries, datasets, and retrievers, and irrelevant content may reduce
+effectiveness \citep{weller-etal-2024-generative}.
 
-\subsection{Evaluating Expansion under Hybrid Fusion}
+\subsection{Retriever-Aware Expansion and Integration}
 
-Query-expansion methods commonly evaluate retrieval using a fixed top-$L$
-prefix from each ranking
-\citep{zhang-etal-2024-exploring-best,liu-zhang-2025-exp4fuse}. In hybrid
-retrieval, $L$ also determines which cross-channel contributions enter fusion,
-making the measured expansion effect conditional on the selected cutoff.
-Following EAHR, we evaluate complete-list retrieval effectiveness separately from
-channel access depth \citep{zhang2026exact}, and ask whether query expansion can
-improve the former while reducing the latter.
+Prior work addresses retriever dependence at three stages: generation,
+integration, and fusion. DVCQR generates separate lexical and semantic rewrites
+for sparse and dense retrieval \citep{li-etal-2026-dvcqr}. At integration, MuGI
+applies different formulas to shared pseudo-references for the two retrievers,
+while Word2Passage reweights generated terms to reduce lexical noise
+\citep{zhang-etal-2024-exploring-best,choi-etal-2025-word2passage}. At fusion,
+Exp4Fuse combines original and expanded rankings, whereas QuDAR adaptively
+combines four routes formed by original and expanded queries under both
+retriever types \citep{liu-zhang-2025-exp4fuse,kim-etal-2026-qudar}.
 
-\subsection{Channel-Aware Integration}
-
-Generated content can enter retrieval through query text, dense
-representations, term weights, or rank fusion. Query2doc modifies the query
-text, MuGI pools representations from multiple references, Word2Passage
-reweights generated terms, and Exp4Fuse combines original and expanded
-rankings
-\citep{wang-etal-2023-query2doc,zhang-etal-2024-exploring-best,choi-etal-2025-word2passage,liu-zhang-2025-exp4fuse}.
-DVCQR further constructs separate lexical and semantic views for sparse and
-dense retrieval \citep{li-etal-2026-dvcqr}. These methods differ in where
-expansion is integrated; DESA instead focuses on how the same generated passages should
-be constrained differently across the two channels.
-
-Recent work also combines heterogeneous retrievers per query: MoR weights
-sparse and dense retrievers, while QuDAR adaptively fuses four rankings formed
-by original and expanded queries under both retriever types
-\citep{kalra-etal-2025-mor,kim-etal-2026-qudar}. DESA instead modifies the dense
-and sparse rankings before fusion: generated passages expand dense semantic
-coverage while sparse retrieval remains anchored to the original query's
-lexical support.
+DESA departs from this channel-wise view. Because complete-list effectiveness
+and per-channel certification depths are properties of the fused result, the
+two channels cannot be designed independently. Prior methods adapt generation,
+integration, or fusion to retriever-specific behavior, but do not use this
+cross-channel dependence as a design constraint. DESA instead couples dense
+and sparse retrieval under an effectiveness--depth objective, sharing evidence
+across channels to add dense semantic directions while only reordering the
+original sparse support.

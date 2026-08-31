@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import heapq
+import math
 from collections.abc import Sequence
+from dataclasses import dataclass
 
 from .fusion import complete_wrrf, wrrf_contribution
 from .models import ReplayResult
@@ -14,26 +16,39 @@ def _precedes(score_a: float, id_a: str, score_b: float, id_b: str) -> bool:
 class _IncrementalCertificate:
     """Maintain the replay certificate without sorting every observed item per step."""
 
-    def __init__(self, universe_size: int, top_k: int, constant: int) -> None:
+    def __init__(
+        self,
+        universe_size: int,
+        top_k: int,
+        constant: int,
+        channel_count: int = 2,
+        weights: Sequence[float] | None = None,
+    ) -> None:
         self.universe_size = universe_size
         self.top_k = top_k
         self.constant = constant
+        self.channel_count = channel_count
+        self.weights = tuple(weights or [1.0] * channel_count)
+        if len(self.weights) != channel_count or any(weight < 0.0 for weight in self.weights):
+            raise ValueError("weights must be nonnegative and match the channel count")
         self.contributions: dict[str, list[float | None]] = {}
         self.versions: dict[str, int] = {}
         self.lower_heap: list[tuple[float, str, int]] = []
         self.category_heaps: dict[int, list[tuple[float, str, int]]] = {
-            1: [],
-            2: [],
-            3: [],
+            category: [] for category in range(1, 1 << channel_count)
         }
 
     def observe(self, document_id: str, channel: int, contribution: float) -> None:
-        values = self.contributions.setdefault(document_id, [None, None])
+        values = self.contributions.setdefault(
+            document_id, [None] * self.channel_count
+        )
         values[channel] = contribution
         version = self.versions.get(document_id, 0) + 1
         self.versions[document_id] = version
-        lower = sum(value or 0.0 for value in values)
-        category = (1 if values[0] is not None else 0) | (2 if values[1] is not None else 0)
+        lower = math.fsum(value or 0.0 for value in values)
+        category = sum(
+            1 << index for index, value in enumerate(values) if value is not None
+        )
         entry = (-lower, document_id, version)
         heapq.heappush(self.lower_heap, entry)
         heapq.heappush(self.category_heaps[category], entry)
@@ -45,7 +60,9 @@ class _IncrementalCertificate:
         if category is None:
             return True
         values = self.contributions[document_id]
-        current = (1 if values[0] is not None else 0) | (2 if values[1] is not None else 0)
+        current = sum(
+            1 << index for index, value in enumerate(values) if value is not None
+        )
         return current == category
 
     def _top_documents(self) -> list[str]:
@@ -80,20 +97,25 @@ class _IncrementalCertificate:
         next_bounds = tuple(
             0.0
             if positions[index] == lengths[index]
-            else wrrf_contribution(positions[index] + 1, self.constant)
-            for index in range(2)
+            else self.weights[index]
+            * wrrf_contribution(positions[index] + 1, self.constant)
+            for index in range(self.channel_count)
         )
         winners = self._top_documents()
         if len(winners) < self.top_k:
             return None
 
         def lower(document_id: str) -> float:
-            return sum(value or 0.0 for value in self.contributions[document_id])
+            return math.fsum(
+                value or 0.0 for value in self.contributions[document_id]
+            )
 
         def upper(document_id: str) -> float:
             values = self.contributions[document_id]
-            return lower(document_id) + sum(
-                next_bounds[index] for index, value in enumerate(values) if value is None
+            return lower(document_id) + math.fsum(
+                next_bounds[index]
+                for index, value in enumerate(values)
+                if value is None
             )
 
         for left_index, left_id in enumerate(winners):
@@ -104,7 +126,7 @@ class _IncrementalCertificate:
         winner_set = set(winners)
         boundary_id = winners[-1]
         boundary_lower = lower(boundary_id)
-        for category in (1, 2, 3):
+        for category in range(1, 1 << self.channel_count):
             outsider_id = self._best_outsider(category, winner_set)
             if outsider_id is not None and not _precedes(
                 boundary_lower, boundary_id, upper(outsider_id), outsider_id
@@ -112,7 +134,7 @@ class _IncrementalCertificate:
                 return None
 
         if len(self.contributions) < self.universe_size:
-            fully_unseen_upper = next_bounds[0] + next_bounds[1]
+            fully_unseen_upper = math.fsum(next_bounds)
             if boundary_lower <= fully_unseen_upper:
                 return None
         return winners
@@ -169,3 +191,82 @@ def replay_complete_wrrf(
         positions[channel] += 1
         if keep_trace:
             trace.append((positions[0], positions[1], "dense" if channel == 0 else "sparse"))
+
+
+@dataclass(frozen=True)
+class MultiReplayResult:
+    ordered_top_k: tuple[str, ...]
+    depths: tuple[int, ...]
+    checks: int
+
+
+def replay_complete_wrrf_multi(
+    rankings: Sequence[Sequence[str]],
+    *,
+    top_k: int = 20,
+    constant: int = 60,
+    weights: Sequence[float] | None = None,
+) -> MultiReplayResult:
+    """Certify weighted complete-list WRRF over any number of channels."""
+    frozen = tuple(tuple(ranking) for ranking in rankings)
+    if not frozen:
+        raise ValueError("at least one ranking is required")
+    if any(len(set(ranking)) != len(ranking) for ranking in frozen):
+        raise ValueError("rankings must not contain duplicate document ids")
+    resolved_weights = tuple(weights or [1.0] * len(frozen))
+    if len(resolved_weights) != len(frozen):
+        raise ValueError("rankings and weights must have equal length")
+    universe = set().union(*map(set, frozen))
+    if top_k > len(universe):
+        raise ValueError("top_k exceeds ranking universe")
+
+    positions = [0] * len(frozen)
+    lengths = tuple(map(len, frozen))
+    certificate = _IncrementalCertificate(
+        len(universe),
+        top_k,
+        constant,
+        channel_count=len(frozen),
+        weights=resolved_weights,
+    )
+    checks = 0
+    while True:
+        checks += 1
+        certified = certificate.certify(positions, lengths)
+        if certified is not None:
+            expected = complete_wrrf(
+                frozen,
+                top_k=top_k,
+                constant=constant,
+                weights=resolved_weights,
+            )
+            if certified != expected:
+                raise AssertionError(
+                    "replay certificate disagrees with complete WRRF: "
+                    f"certified={certified!r}, expected={expected!r}, depths={positions!r}"
+                )
+            return MultiReplayResult(tuple(certified), tuple(positions), checks)
+
+        available = [
+            channel
+            for channel in range(len(frozen))
+            if positions[channel] < lengths[channel]
+        ]
+        if not available:
+            raise AssertionError("rankings exhausted without certification")
+        channel = min(
+            available,
+            key=lambda index: (
+                -resolved_weights[index]
+                * wrrf_contribution(positions[index] + 1, constant),
+                index,
+            ),
+        )
+        rank = positions[channel] + 1
+        document_id = frozen[channel][positions[channel]]
+        certificate.observe(
+            document_id,
+            channel,
+            resolved_weights[channel] * wrrf_contribution(rank, constant),
+        )
+        positions[channel] += 1

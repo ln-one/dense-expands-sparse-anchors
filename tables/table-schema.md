@@ -10,8 +10,8 @@
 | T6 | Mechanism diagnostics | dataset × channel | angle, turnover, support retention, relevant-rank movement, isolated quality/depth effects | mechanism per-query records |
 | T7 | Query-level fixed-cutoff diagnostics | L × method | exact Top-20, metric changes, conclusion changes, strict reversals | `report/fixed-top-l-*.csv` |
 | T8 | Functional operator controls | control pair × metric | macro quality, paired effect, CI, Holm-adjusted p | `report/operator-control-*.csv` |
-| T9 | Matched QuDAR-simple baseline | dataset × method | nDCG@10, Recall@20, paired effects | `report/qudar-*.csv` |
-| T10 | Main-text external comparisons with explicit subset blocks | method within seven-dataset matched-evidence or four-dataset prior-QE block | nDCG@10, Recall@20, mean accessed rank entries | `report/qudar-*.csv`, prior-method aggregates frozen in the Results artifacts |
+| T9 | Matched QuDAR controls | dataset × complete-list variant | nDCG@10, Recall@20, paired effects, four-channel certification depth | `report/qudar-baseline-results.csv`, `report/qudar-paired-tests.csv`, `report/qudar-depth-*.csv` |
+| T10 | Main-text external comparisons with explicit subset blocks | method within seven-dataset matched-evidence or prior-QE block | nDCG@10, Recall@20, total logical certification depth | `report/qudar-*.csv`, prior-method aggregates frozen in the Results artifacts |
 | T11 | Per-dataset channel evidence | dataset plus cross-dataset pattern row | relative nDCG@10 changes, Dense/Sparse depth reductions, normalized Sparse support | `report/main-results.csv`, controlled primary condition |
 
 Every aggregate row stores the source artifact hash, configuration hash, number of

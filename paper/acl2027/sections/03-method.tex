@@ -1,43 +1,60 @@
 \section{DESA}
 \label{sec:method}
 
-\subsection{Method Overview}
+\subsection{Coupled Construction Overview}
 
-Given an original query $q_o$, DESA generates a set of complementary
-reference passages $R=\{r_1,\ldots,r_n\}$. Dense retrieval keeps the original
-query as its base direction and adds only the new semantic component supplied
-by the references. Sparse retrieval combines the original and expanded scores
-so that generated terms can reorder documents already matched by the original
-query without introducing expansion-only matches. The resulting dense and
-sparse rankings are fused into the final result. Figure~\ref{fig:desa-overview}
-summarizes this design: Dense expands; Sparse anchors.
+DESA jointly designs dense and sparse query construction for the fused result,
+aiming to improve complete-list effectiveness while reducing both certification
+depths relative to the unexpanded query. Given an original query $q_o$, DESA
+first generates one set of complementary reference passages
+$R=\{r_1,\ldots,r_n\}$ shared by both channels. This common evidence basis
+prevents channel differences from originating in independently generated
+rewrites, placing specialization entirely in integration. Dense retrieval may
+incorporate new semantic directions from the references, whereas sparse
+retrieval may only reorder documents supported by the original query. The
+resulting dense and sparse rankings are fused into the final result.
+Figure~\ref{fig:desa-overview} summarizes this coupled construction.
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=\columnwidth]{figures/fig_desa_overview.pdf}
-  \caption{Design principle of DESA. The same generated passages expand dense
-  semantic coverage but remain anchored to the original query's lexical
-  support in sparse retrieval.}
+  \caption{Coupled construction in DESA. A shared reference set establishes a
+  common evidence basis. Orthogonal residual expansion adds new dense semantic
+  directions, whereas score-product anchoring restricts sparse reordering to
+  the original query's support.}
   \label{fig:desa-overview}
 \end{figure}
 
-\subsection{Complementary Reference Generation}
+\subsection{Shared Reference Generation}
+
+DESA generates one reference set before constructing either channel ranking,
+rather than producing a separate rewrite for each retriever. The generated
+evidence is therefore held common across channels, so their differences arise
+from controlled integration rather than different generated content.
 
 The generator is prompted to produce $n$ short passages that could plausibly
 occur in relevant documents. Each passage introduces a different alias,
 technical term, or paraphrase while retaining the entities, relations,
 numbers, polarity, temporal conditions, scope, and other constraints of
 $q_o$. The prompt prohibits broader information needs and invented answers.
-The passages therefore vary in expression rather than intent, allowing the
-two retrieval channels to draw additional cues from a shared expansion.
-The complete prompt and decoding settings are provided in Appendix~A.
+The passages therefore vary in expression rather than intent. The same set
+$R$ is supplied unchanged to both channel operators. The complete prompt and
+decoding settings are provided in Appendix~A.
 
-\subsection{Channel-Asymmetric Query Construction}
+\subsection{Coupled Dense--Sparse Construction}
+
+The two operators act on the same original query and generated references but
+assign different roles to the shared evidence. Dense retrieval permits the
+references to add semantic information, subject to bounded deviation from the
+original query. Sparse retrieval permits them to alter ranking order, but not
+to admit documents unsupported by the original query.
 
 \subsubsection{Orthogonal Residual Expansion}
 
-Let $f_D$ be the dense encoder. We encode the original query and each
-query--reference pair as unit vectors:
+The dense branch should incorporate semantic information absent from the
+original query without allowing the generated references to replace its
+original direction. Let $f_D$ be the dense encoder. We encode the original
+query and each query--reference pair as unit vectors:
 
 \[
 \begin{aligned}
@@ -48,8 +65,8 @@ query--reference pair as unit vectors:
 \end{aligned}
 \]
 
-The component of $\bar{\mathbf v}_r$ parallel to the original query is
-removed, and the remaining residual is added to $\mathbf v_o$:
+We remove the component of $\bar{\mathbf v}_r$ parallel to the original query
+and add the remaining residual to $\mathbf v_o$:
 
 \[
 \mathbf z=
@@ -72,11 +89,17 @@ $\|\mathbf z\|\leq1$,
 The references can therefore add semantic directions absent from the original
 representation while keeping the expanded query within $45^\circ$ of it. If
 they contribute no orthogonal component, then $\mathbf e_D=\mathbf v_o$.
+Orthogonal residual expansion thus grants the shared evidence additive
+semantic authority through a bounded, parameter-free update.
 
 \subsubsection{Score-Product Anchoring}
 
-For sparse retrieval, the expanded query concatenates the original query and
-all reference passages:
+The sparse branch requires a different constraint. Directly adding generated
+terms may admit expansion-only documents, changing the sparse support and its
+relation to the dense ranking. DESA instead allows generated lexical evidence
+to reorder documents only within the original sparse support.
+
+The expanded query concatenates the original query and all reference passages:
 
 \[
 q_r=\operatorname{concat}(q_o,r_1,\ldots,r_n).
@@ -94,7 +117,8 @@ s_A(d)&=s_o(d)s_r(d).&&
 \]
 
 Because $q_r$ contains $q_o$, every document supported by the original query
-is also supported by the expanded query. Hence,
+is also supported by the expanded query. With
+$\operatorname{supp}(s)=\{d:s(d)>0\}$,
 
 \[
 \operatorname{supp}(s_A)
@@ -107,35 +131,5 @@ Generated terms may promote or demote documents within the original support,
 but documents matched only by the expansion receive zero anchored score and
 are excluded. If $s_r$ is merely a positive multiple of $s_o$, the original
 sparse order is unchanged; positive global score rescaling also leaves the
-ranking invariant.
-
-\subsection{Complete Fusion and Access Measurement}
-\label{sec:quality-access}
-
-We use the complete-list target and bound-based replay of
-\citet{zhang2026exact}; DESA changes the query construction, not this evaluation
-protocol. Complete dense and sparse rankings are fused by equal-weight RRF
-\citep{cormack-etal-2009-rrf}:
-
-\[
-F(d)=
-\sum_{c\in\{D,S\}}
-\frac{1}{\kappa+\operatorname{rank}_{\pi_c}(d)}.
-\]
-
-A document absent from a channel contributes zero. Sorting by $F(d)$, with
-document identifiers breaking ties, defines the ordered target $T_K$.
-Retrieval effectiveness is evaluated directly on this complete-list result.
-
-To measure channel access, a fixed replay procedure progressively reveals
-$\pi_D$ and $\pi_S$. After $L_c$ items have been read from channel $c$, the
-largest possible contribution from its next unread item is
-
-\[
-u_c(L_c)=\frac{1}{\kappa+L_c+1}.
-\]
-
-The replay reads from the channel with the larger bound, breaking ties in
-favor of the dense channel, until unread documents can no longer change the
-membership or order of $T_K$. It records the replay stopping depths
-$(L_D,L_S)$ required to determine the complete-list result.
+ranking invariant. Score-product anchoring therefore grants the shared
+evidence reordering authority but no independent sparse admission authority.

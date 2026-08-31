@@ -2,7 +2,7 @@
 
 ### Paragraph 1: evaluation protocol
 - Role: define the fixed-Top-$L$ and complete-fusion estimands.
-- Main claim: the paper uses nDCG/Recall and equally weighted WRRF.
+- Main claim: the paper uses nDCG/Recall and equal-weight RRF.
 - Evidence IDs: E21, E27.
 - Transition: from evaluated result to datasets and retrievers.
 - Forbidden content: new claims about method superiority.
@@ -25,7 +25,7 @@
 ### Limitations paragraph
 - Role: bound the empirical and operational claims.
 - Main claim: evidence is limited to English BEIR collections, two generators,
-  two dense encoders, BM25, WRRF Top-20 certification, and offline logical
+  two dense encoders, BM25, RRF top-20 certification, and offline logical
   replay; generation and incomplete judgments create additional uncertainty.
 - Evidence IDs: E12, E20--E26.
 - Forbidden content: defensive language or new experiments.

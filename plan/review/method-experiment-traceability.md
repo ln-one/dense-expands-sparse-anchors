@@ -11,3 +11,4 @@
 | Dense expansion is bounded in realized queries | orthogonal residual | query-angle audit | T6/F5 | observed angles satisfy the analytic bound | complete |
 | Sparse anchoring changes order within the original support | score product | support and relevant-rank audit | T6/F5 | exact mathematical property; empirical retention reported separately | complete |
 | Mechanism magnitude explains outcomes | both operators | quartile and correlation analysis | T6/F6 | descriptive association only; no adaptive rule | complete |
+| Joint construction compresses matched four-signal evidence | complete four-channel RRF and replay | post-held-out matched QuDAR control | T9/T10 | statistically unresolved quality difference and policy-specific total certification-depth difference only | in progress |

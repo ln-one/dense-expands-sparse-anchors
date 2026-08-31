@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import heapq
+import math
 from collections import defaultdict
 from collections.abc import Mapping, Sequence
 
@@ -25,11 +27,21 @@ def complete_wrrf(
         weights = [1.0] * len(rankings)
     if len(rankings) != len(weights):
         raise ValueError("rankings and weights must have equal length")
-    scores: defaultdict[str, float] = defaultdict(float)
+    contributions: defaultdict[str, list[float]] = defaultdict(list)
     for ranking, weight in zip(rankings, weights, strict=True):
         for rank, document_id in enumerate(ranking, start=1):
-            scores[document_id] += weight * wrrf_contribution(rank, constant)
-    return sorted(scores, key=lambda document_id: (-scores[document_id], document_id))[:top_k]
+            contributions[document_id].append(
+                weight * wrrf_contribution(rank, constant)
+            )
+    scores = {
+        document_id: math.fsum(values)
+        for document_id, values in contributions.items()
+    }
+    return heapq.nsmallest(
+        top_k,
+        scores,
+        key=lambda document_id: (-scores[document_id], document_id),
+    )
 
 
 def fixed_top_l_wrrf(

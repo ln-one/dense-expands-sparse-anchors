@@ -80,6 +80,24 @@ def _evaluate_dataset(
     store_path = root / "artifacts" / "rankings" / dataset / "rankings.sqlite3"
     document_ids = RankingStore.load_document_ids(store_path)
     qrels = load_qrels(root / "data" / "processed" / dataset / "qrels.tsv")
+    confidence_rows = read_jsonl(
+        root
+        / "artifacts"
+        / "results"
+        / "derived"
+        / "qudar-confidence"
+        / f"{dataset}.jsonl"
+    )
+    confidence_weights = {
+        (str(row["query_id"]), int(row["draw_id"])): (
+            float(row["w_os"]),
+            float(row["w_od"]),
+            float(row["w_es"]),
+            float(row["w_ed"]),
+        )
+        for row in confidence_rows
+        if row["method"] == "qudar_confidence_matched"
+    }
     operator_rows: list[dict[str, object]] = []
     qudar_rows: list[dict[str, object]] = []
     with RankingStore(store_path, dataset, document_ids) as store:
@@ -162,6 +180,40 @@ def _evaluate_dataset(
                     },
                 }
             )
+            rankings = (os.ranking, od.ranking, es.ranking, ed.ranking)
+            for method, weights in (
+                ("qudar_complete_uniform_rrf_matched", None),
+                (
+                    "qudar_complete_confidence_rrf_matched",
+                    confidence_weights[(query_id, draw_id)],
+                ),
+            ):
+                complete_fused = complete_wrrf(
+                    rankings,
+                    top_k=20,
+                    constant=60,
+                    weights=weights,
+                )
+                qudar_rows.append(
+                    {
+                        "dataset": dataset,
+                        "query_id": query_id,
+                        "draw_id": draw_id,
+                        "method": method,
+                        "ndcg_at_10": ndcg_at_k(complete_fused, qrels[query_id], 10),
+                        "recall_at_20": recall_at_k(
+                            complete_fused, qrels[query_id], 20
+                        ),
+                        "retrieval_depth_per_signal": None,
+                        "rrf_constant": 60,
+                        "ranking_sha256": {
+                            "os": os.ranking_sha256,
+                            "od": od.ranking_sha256,
+                            "es": es.ranking_sha256,
+                            "ed": ed.ranking_sha256,
+                        },
+                    }
+                )
     return operator_rows, qudar_rows, ranking_store_digest(store_path)
 
 
@@ -272,11 +324,25 @@ def run(root: Path) -> None:
     _aggregate(comparison, ["ndcg_at_10", "recall_at_20"]).to_csv(
         report_directory / "qudar-baseline-results.csv", index=False
     )
-    paired_quality_tests(
-        comparison,
-        proposed="desa",
-        comparator="qudar_simple_rrf_matched",
+    pd.concat(
+        [
+            paired_quality_tests(comparison, proposed="desa", comparator=comparator)
+            for comparator in (
+                "qudar_simple_rrf_matched",
+                "qudar_complete_uniform_rrf_matched",
+                "qudar_complete_confidence_rrf_matched",
+            )
+        ],
+        ignore_index=True,
     ).to_csv(report_directory / "qudar-paired-tests.csv", index=False)
+    paired_quality_tests(
+        qudar_frame,
+        proposed="qudar_complete_confidence_rrf_matched",
+        comparator="qudar_complete_uniform_rrf_matched",
+    ).to_csv(
+        report_directory / "qudar-complete-confidence-vs-uniform-tests.csv",
+        index=False,
+    )
 
     write_json(
         report_directory / "evidence-strengthening-manifest.json",
@@ -293,7 +359,11 @@ def run(root: Path) -> None:
             "qudar_simple_rrf_matched_sha256": sha256_file(qudar_path),
             "ranking_store_sha256": ranking_hashes,
             "qudar_specification": {
-                "variant": "QuDAR-simple RRF",
+                "variants": [
+                    "QuDAR-simple fixed-top-1000 RRF",
+                    "QuDAR complete-list uniform RRF",
+                    "QuDAR complete-list confidence-weighted RRF",
+                ],
                 "official_code_commit": "0702721e82799d0489850d3f94ac787da43436ad",
                 "official_repository": "https://github.com/kaist-dmlab/QuDAR",
                 "retrieval_depth_per_signal": 1000,

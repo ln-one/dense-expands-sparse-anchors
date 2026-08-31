@@ -1,7 +1,11 @@
 import random
 
 from hybrid_query_construction.fusion import complete_wrrf, fixed_top_l_wrrf
-from hybrid_query_construction.replay import _precedes, replay_complete_wrrf
+from hybrid_query_construction.replay import (
+    _precedes,
+    replay_complete_wrrf,
+    replay_complete_wrrf_multi,
+)
 
 
 def _brute_replay(
@@ -86,3 +90,18 @@ def test_replay_matches_complete_fusion_over_random_rankings() -> None:
                 assert (replay.dense_depth, replay.sparse_depth) == _brute_replay(
                     dense, sparse, top_k, constant
                 )
+
+
+def test_multi_replay_matches_weighted_four_channel_fusion() -> None:
+    generator = random.Random(20260830)
+    documents = [f"d{index:03d}" for index in range(100)]
+    rankings = tuple(generator.sample(documents, 100) for _ in range(4))
+    weights = (0.31, 0.19, 0.27, 0.23)
+    replay = replay_complete_wrrf_multi(rankings, top_k=20, weights=weights)
+    assert list(replay.ordered_top_k) == complete_wrrf(
+        rankings, top_k=20, weights=weights
+    )
+    assert all(
+        depth <= len(ranking)
+        for depth, ranking in zip(replay.depths, rankings, strict=True)
+    )

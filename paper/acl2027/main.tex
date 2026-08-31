@@ -11,6 +11,7 @@
 \usepackage{booktabs}
 \usepackage{graphicx}
 \usepackage{float}
+\usepackage{placeins}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage{microtype}
@@ -39,7 +40,7 @@
   \par\smallskip
 }
 
-\title{Dense Expands, Sparse Anchors: Channel-Asymmetric Query Expansion for Hybrid Retrieval}
+\title{Dense Expands, Sparse Anchors: Coordinated Query Expansion}
 
 \ifdefined\ARXIVVERSION
 \author{
@@ -57,26 +58,24 @@
 \maketitle
 
 \begin{abstract}
-LLM-based query expansion improves retrieval by generating document-like
-passages. In hybrid retrieval, however, most evaluations
-fuse fixed top-$L$ dense and sparse rankings. Because the cutoff controls both
-which cross-channel contributions enter fusion and how much of each ranking is
-accessed, gains measured at one $L$ can change or reverse at another. We
-separate these effects by evaluating retrieval effectiveness under
-complete-list fusion and recording the policy-specific per-channel replay
-stopping depths at which its ordered top-$K$ is certified. We then introduce DESA (Dense
-Expansion and Sparse Anchoring), a channel-asymmetric query expansion method.
-An LLM generates complementary reference passages;
-orthogonal residual expansion adds their new semantic directions to the dense
-query, while score-product anchoring incorporates their lexical cues into
-sparse retrieval without broadening the original query's lexical support.
-Across seven BEIR datasets, DESA improves nDCG@10 and Recall@20
-over the unexpanded query by 3.82\% and 2.38\%, while reducing dense and sparse
-access depths by 36.90\% and 36.56\%. With equal dataset weighting, 63.31\%
-of queries become shallower in both channels. However, both depths increase
-with Contriever on Touch\'e-2020. These results support channel-specific
-integration of generated passages and joint evaluation of retrieval
-effectiveness and access depth.
+Retrieval-augmented generation (RAG) systems rely on retrieval modules to
+ground large language model (LLM) outputs. LLM-based query expansion enriches
+retrieval with document-like passages, but evaluations of hybrid retrieval
+often fuse fixed top-$L$ prefixes of dense and sparse rankings. Because $L$
+controls cross-channel contributions and ranking access, it can alter measured
+expansion gains. We therefore evaluate complete-list effectiveness and record
+per-channel replay stopping depths required to certify the ordered top-$K$.
+This changes the design: because both rankings determine the fused result,
+their query constructions should be coordinated rather than designed
+independently.
+We present DESA (Dense Expansion and Sparse Anchoring), which shares generated
+references across channels but specializes their integration. Orthogonal
+residual expansion adds new semantic directions to the dense query, whereas
+score-product anchoring reorders the original sparse support without admitting
+expansion-only matches. The same references thus play complementary roles:
+Dense expands; Sparse anchors. Across seven BEIR datasets, DESA improves
+nDCG@10 and Recall@20 over the unexpanded query by 3.82\% and 2.38\%, while
+reducing dense and sparse replay stopping depths by 36.90\% and 36.56\%.
 \end{abstract}
 
 \input{sections/01-introduction}

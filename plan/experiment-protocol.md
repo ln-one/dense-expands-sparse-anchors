@@ -55,6 +55,21 @@ Any bug discovered after qrels access increments the protocol version and reruns
 affected held-out conditions. No method, prompt, parameter, preferred draw, or dataset
 may be changed in response to held-out results.
 
+## Post-held-out supplemental amendment: complete-list QuDAR control
+
+The QuDAR comparison added on 2026-08-30 is explicitly supplemental and does
+not alter the frozen primary comparisons or their confirmatory status. It uses
+the already frozen original-sparse, original-dense, expanded-sparse, and
+expanded-dense rankings with matched generated references. The clean control
+fuses all four complete rankings by uniform RRF and extends the same sound
+bound-based replay to four channels. A confidence-weighted variant is retained
+only as a diagnostic because its weights are estimated from Top-1000
+normalized-score margins. Quality inference covers nDCG@10 and Recall@20;
+total-depth inference averages draws within query, weights datasets equally,
+and reports a stratified bootstrap interval and paired sign-flip test. These
+analyses support claims about policy-specific logical certification depth, not
+latency or physical index work.
+
 The three draws for one query are sampled together in a fixed batch of eight sorted
 queries so they reuse prompt prefill. The batch seed and each draw index are stored.
 Invalid draws from that batch receive one deterministic retry batch with the same seed

@@ -4,7 +4,9 @@ import pytest
 from hybrid_query_construction.evidence import (
     fixed_cutoff_diagnostics,
     paired_quality_tests,
+    qudar_confidence_fusion,
     qudar_simple_rrf,
+    uniform_normalized_score_fusion,
 )
 
 
@@ -17,6 +19,27 @@ def test_qudar_simple_rrf_uses_four_truncated_rankings() -> None:
     ]
     with pytest.raises(ValueError):
         qudar_simple_rrf(rankings[:3])
+
+
+def test_qudar_confidence_fusion_weights_score_margins() -> None:
+    signals = (
+        {"a": 3.0, "b": 1.0},
+        {"b": 2.0, "a": 1.0},
+        {"c": 1.0, "a": 0.9},
+        {"a": 1.0, "c": 1.0},
+    )
+    ranking, weights = qudar_confidence_fusion(signals, top_k=3, tau=2.0)
+    assert ranking == ["a", "b", "c"]
+    assert sum(weights) == pytest.approx(1.0)
+    assert weights[0] == pytest.approx(weights[1])
+    assert weights[0] > weights[2] > weights[3]
+    with pytest.raises(ValueError):
+        qudar_confidence_fusion(signals[:3])
+
+
+def test_uniform_normalized_score_fusion() -> None:
+    signals = ({"a": 2.0, "b": 0.0}, {"b": 4.0, "a": 3.0})
+    assert uniform_normalized_score_fusion(signals, top_k=2) == ["a", "b"]
 
 
 def test_fixed_cutoff_diagnostics_counts_conclusion_changes() -> None:

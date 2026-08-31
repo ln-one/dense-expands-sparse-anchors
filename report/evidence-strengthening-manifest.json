@@ -11,7 +11,7 @@
   "fixed_conclusions_sha256": "7e429bb4531f3aeb83370a4b6aae696a3c3540eb26f6cde523e8694a99aa40c9",
   "fixed_diagnostics_sha256": "adb97221f19e6a70892be4f6ab5d095c3b3e8a16989493938c7dc87412e1b157",
   "operator_controls_sha256": "4bcc02152212f816905d0160e45d6938879d85ae314e10c87f15c5268d2dea35",
-  "qudar_simple_rrf_matched_sha256": "5c4f13e7ed45b71c977ccbe6bcebaca19a5337dc0a137cffe8d5112fe3949302",
+  "qudar_simple_rrf_matched_sha256": "182f4cc1a1e6eb5d76f406f31f37026c145bb6cd96272cb908eef58040822f81",
   "qudar_specification": {
     "expanded_signals": "DESA matched generated evidence",
     "official_code_commit": "0702721e82799d0489850d3f94ac787da43436ad",
@@ -24,7 +24,11 @@
       "ES",
       "ED"
     ],
-    "variant": "QuDAR-simple RRF"
+    "variants": [
+      "QuDAR-simple fixed-top-1000 RRF",
+      "QuDAR complete-list uniform RRF",
+      "QuDAR complete-list confidence-weighted RRF"
+    ]
   },
   "ranking_store_sha256": {
     "arguana": "77b1e7d54bbe4d72bb833554e734fd97e4acf6f30a3c94d5bf6d2672607e09de",

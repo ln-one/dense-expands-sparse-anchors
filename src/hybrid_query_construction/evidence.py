@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections import defaultdict
+from collections.abc import Mapping, Sequence
 
 import numpy as np
 import pandas as pd
@@ -30,6 +31,84 @@ def qudar_simple_rrf(
         top_k=top_k,
         constant=constant,
     )
+
+
+def qudar_confidence_fusion(
+    signals: Sequence[Mapping[str, float]],
+    *,
+    retrieval_depth: int = 1000,
+    top_k: int = 20,
+    tau: float = 2.0,
+) -> tuple[list[str], tuple[float, float, float, float]]:
+    """Reproduce QuDAR-confidence over OS, OD, ES, and ED score signals."""
+    if len(signals) != 4:
+        raise ValueError("QuDAR-confidence requires exactly four score signals")
+    if retrieval_depth <= 0 or top_k <= 0 or tau <= 0.0:
+        raise ValueError("depth, top-k, and temperature must be positive")
+
+    normalized = _normalize_score_signals(signals, retrieval_depth)
+    margins: list[float] = []
+    for scores in normalized:
+        values = np.asarray(list(scores.values()), dtype=float)
+        margins.append(
+            0.0
+            if values.size == 0
+            else float(values[0])
+            if values.size == 1
+            else max(float(values[0] - values[1]), 0.0)
+        )
+
+    shifted = (np.asarray(margins) - max(margins)) / tau
+    weights_array = np.exp(shifted)
+    weights_array /= weights_array.sum()
+    weights = tuple(float(value) for value in weights_array)
+    ranking = _weighted_score_ranking(normalized, weights, top_k)
+    return ranking, weights  # type: ignore[return-value]
+
+
+def uniform_normalized_score_fusion(
+    signals: Sequence[Mapping[str, float]],
+    *,
+    retrieval_depth: int = 1000,
+    top_k: int = 20,
+) -> list[str]:
+    """Fuse independently min-max-normalized signals with uniform weights."""
+    if not signals:
+        raise ValueError("score fusion requires at least one signal")
+    if retrieval_depth <= 0 or top_k <= 0:
+        raise ValueError("depth and top-k must be positive")
+    normalized = _normalize_score_signals(signals, retrieval_depth)
+    weights = [1.0 / len(normalized)] * len(normalized)
+    return _weighted_score_ranking(normalized, weights, top_k)
+
+
+def _normalize_score_signals(
+    signals: Sequence[Mapping[str, float]], retrieval_depth: int
+) -> list[dict[str, float]]:
+    normalized: list[dict[str, float]] = []
+    for signal in signals:
+        ranked = sorted(signal, key=lambda document_id: (-signal[document_id], document_id))[
+            :retrieval_depth
+        ]
+        values = np.asarray([signal[document_id] for document_id in ranked], dtype=float)
+        if values.size:
+            values = (values - values.min()) / (values.max() - values.min() + 1e-12)
+        normalized.append(dict(zip(ranked, values, strict=True)))
+    return normalized
+
+
+def _weighted_score_ranking(
+    normalized: Sequence[Mapping[str, float]],
+    weights: Sequence[float],
+    top_k: int,
+) -> list[str]:
+    fused: defaultdict[str, float] = defaultdict(float)
+    for weight, scores in zip(weights, normalized, strict=True):
+        for document_id, score in scores.items():
+            fused[document_id] += weight * score
+    return sorted(fused, key=lambda document_id: (-fused[document_id], document_id))[
+        :top_k
+    ]
 
 
 def fixed_cutoff_diagnostics(
