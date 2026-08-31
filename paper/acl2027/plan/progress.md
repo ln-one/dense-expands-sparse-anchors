@@ -11,8 +11,8 @@ The English Results chapter has been rebuilt from that approved argument and
 is ready for paragraph-level author review. The approved Chinese Conclusion
 has been translated, reviewed, and added to the ACL draft. The abstract now
 includes the frozen primary findings and observed access boundary.
-The title and method name are locked as `Dense Expands, Sparse Anchors:
-Coordinated Query Expansion` and DESA (Dense Expansion and Sparse Anchoring).
+The title and method name are locked as `Query Expansion Should Be Coordinated:
+Dense Expands, Sparse Anchors` and DESA (Dense Expansion and Sparse Anchoring).
 The manuscript now has a shared-source public arXiv build with the author's
 name, affiliation, location, and contact email; the ACL build remains anonymous.
 
@@ -715,3 +715,11 @@ without repeating table contents or claim boundaries.
 - Verification: changed scripts pass Ruff; 14 targeted tests pass; anonymous
   and public PDFs compile to 12 pages; the final appendix page is visually
   balanced; `git diff --check` passes.
+
+## 2026-08-31 - Coordination-first title
+
+- Renamed the paper to *Query Expansion Should Be Coordinated: Dense Expands,
+  Sparse Anchors* so the title states the cross-channel design claim before the
+  DESA slogan.
+- The public ACL-style build keeps the title on one centered line without
+  changing the 12-page layout.

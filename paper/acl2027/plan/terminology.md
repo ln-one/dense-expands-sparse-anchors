@@ -24,7 +24,8 @@
 Use `query expansion` as the paper-wide category. Reserve `query rewriting`
 for descriptions of sources that use that term. `Dense expands; sparse anchors.`
 is a narrative summary rather than a separately defined algorithmic term.
-The paper title is `Dense Expands, Sparse Anchors: Coordinated Query Expansion`.
+The paper title is `Query Expansion Should Be Coordinated: Dense Expands,
+Sparse Anchors`.
 
 Use lowercase `dense` and `sparse` in ordinary prose, following recent ACL
 retrieval papers. Capitalization is reserved for the title-level slogan and
