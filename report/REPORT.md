@@ -1,16 +1,16 @@
-# 正式实验结果报告
+# Experiment results
 
-> 本报告只读取真实逐查询记录；七个正式数据集等权汇总，鲁棒性与规模实验按 track 单独报告。
+> Results use per-query records and equal weighting across the seven datasets. Robustness and scale experiments are reported separately.
 
-## 数据完整性
+## Records
 
-- 逐查询×方法×生成重复结果：665,376 条
-- 独立查询单元：3,976 条
-- 数据集：11 个
-- 方法：11 个
-- 生成失败回退率：0.0413%
+- Query–method–draw records: 665,376
+- Distinct queries: 3,976
+- Datasets: 11
+- Methods: 11
+- Generation fallback rate: 0.0413%
 
-## Controlled 主结果（数据集等权）
+## Controlled results (equal dataset weights)
 
 | method                 |   ndcg_at_10 |   recall_at_20 |   dense_depth |   sparse_depth |
 |:-----------------------|-------------:|---------------:|--------------:|---------------:|
@@ -23,7 +23,7 @@
 | sparse_only            |       0.4714 |         0.4678 |      884.4407 |       822.0169 |
 | sparse_references_only |       0.4565 |         0.4592 |      978.5421 |       974.8536 |
 
-### 主结果的查询级分层 bootstrap 95% 区间
+### Stratified query bootstrap: 95% intervals
 
 | method                 | metric       |   estimate |   ci95_lower |   ci95_upper |
 |:-----------------------|:-------------|-----------:|-------------:|-------------:|
@@ -60,7 +60,7 @@
 | sparse_references_only | dense_depth  |   978.5421 |     732.2534 |    1282.8643 |
 | sparse_references_only | sparse_depth |   974.8536 |     729.1148 |    1279.3796 |
 
-## 七个正式数据集主结果
+## Results by dataset
 
 | dataset          | method                 |   ndcg_at_10 |   recall_at_20 |   dense_depth |   sparse_depth |   sparse_support |   sparse_exhaustion_rate |   fallback_rate |
 |:-----------------|:-----------------------|-------------:|---------------:|--------------:|---------------:|-----------------:|-------------------------:|----------------:|
@@ -121,7 +121,7 @@
 | webis-touche2020 | sparse_only            |       0.4034 |         0.3531 |     1547.6735 |      1547.3333 |      151618.8707 |                   0.0000 |          0.0000 |
 | webis-touche2020 | sparse_references_only |       0.3656 |         0.3199 |     2363.0748 |      2362.8367 |      267666.0612 |                   0.0000 |          0.0000 |
 
-## 2×2 机制实验（数据集等权）
+## Factorial comparison (equal dataset weights)
 
 | method      |   ndcg_at_10 |   recall_at_20 |   dense_depth |   sparse_depth |
 |:------------|-------------:|---------------:|--------------:|---------------:|
@@ -130,7 +130,7 @@
 | proposed    |       0.4747 |         0.4695 |      728.8784 |       673.1993 |
 | sparse_only |       0.4714 |         0.4678 |      884.4407 |       822.0169 |
 
-## 相对 Original 的访问变化
+## Access changes relative to Original
 
 | dataset          | method                 |   dense_total_reduction_pct |   sparse_total_reduction_pct |   dual_depth_improvement_rate |
 |:-----------------|:-----------------------|----------------------------:|-----------------------------:|------------------------------:|
@@ -191,7 +191,7 @@
 | webis-touche2020 | sparse_only            |                      25.656 |                       25.659 |                         0.327 |
 | webis-touche2020 | sparse_references_only |                     -13.512 |                      -13.522 |                         0.204 |
 
-### 数据集等权访问变化及 95% 区间
+### Macro access changes and 95% intervals
 
 | dataset             | method                 | metric                      |   estimate |   ci95_lower |   ci95_upper |
 |:--------------------|:-----------------------|:----------------------------|-----------:|-------------:|-------------:|
@@ -220,7 +220,7 @@
 | macro_equal_dataset | sparse_references_only | dual_depth_improvement_rate |     0.4937 |       0.4662 |       0.5217 |
 | macro_equal_dataset | sparse_references_only | sparse_total_reduction_pct  |    -0.8641 |     -95.0453 |      11.4491 |
 
-## 主比较
+## Primary comparisons
 
 | comparison                | metric       |   favorable_difference |   ci95_lower |   ci95_upper |    p_raw |   p_holm |
 |:--------------------------|:-------------|-----------------------:|-------------:|-------------:|---------:|---------:|
@@ -233,16 +233,16 @@
 | proposed_vs_bridge_shared | dense_depth  |            -121.429364 |  -366.994366 |    39.717006 | 0.315668 | 0.631337 |
 | proposed_vs_bridge_shared | sparse_depth |             -66.450252 |  -310.622056 |    92.991215 | 0.790921 | 0.790921 |
 
-### 结论分类
+### Outcome classification
 
 | comparison                | classification   | rule                 |
 |:--------------------------|:-----------------|:---------------------|
-| proposed_vs_bridge_shared | 混合               | 四项有利差值的95%区间同向，否则为混合 |
-| proposed_vs_original      | 强阳性              | 四项有利差值的95%区间同向，否则为混合 |
+| proposed_vs_bridge_shared | mixed               | All four favorable differences have same-sign 95% intervals; otherwise mixed |
+| proposed_vs_original      | positive              | All four favorable differences have same-sign 95% intervals; otherwise mixed |
 
-## 公开方法完整复现
+## Complete baseline methods
 
-下表将各论文对应的提示词与整合规则同冻结的 Original 和 Proposed 并列展示；该表为描述性完整方法比较，预注册显著性检验仍只针对 controlled 主比较。
+Each baseline uses its paper-specific prompt and integration rule. These descriptive comparisons accompany Original and Proposed; registered tests cover the controlled primary comparisons.
 
 | source                           | method    |   ndcg_at_10 |   recall_at_20 |   dense_depth |   sparse_depth |
 |:---------------------------------|:----------|-------------:|---------------:|--------------:|---------------:|
@@ -252,9 +252,9 @@
 | published_prompt_and_integration | mugi      |       0.4584 |         0.4596 |     1396.6025 |      1393.4694 |
 | published_prompt_and_integration | query2doc |       0.4728 |         0.4675 |      892.3068 |       879.2349 |
 
-## 消融与敏感性
+## Ablations and sensitivity
 
-### 参考文本数量
+### Reference count
 
 |   reference_count |   ndcg_at_10 |   recall_at_20 |   dense_depth |   sparse_depth |
 |------------------:|-------------:|---------------:|--------------:|---------------:|
@@ -262,7 +262,7 @@
 |            3.0000 |       0.4730 |         0.4675 |      775.8423 |       713.2974 |
 |            5.0000 |       0.4747 |         0.4695 |      728.8784 |       673.1993 |
 
-### Sparse 算子
+### Sparse operator
 
 | method                 |   ndcg_at_10 |   recall_at_20 |   dense_depth |   sparse_depth |
 |:-----------------------|-------------:|---------------:|--------------:|---------------:|
@@ -270,7 +270,7 @@
 | sparse_boolean_mask    |       0.4675 |         0.4660 |      626.1448 |       575.2442 |
 | sparse_references_only |       0.4565 |         0.4592 |      978.5421 |       974.8536 |
 
-### RRF 常数
+### RRF constant
 
 |   rrf_constant |   ndcg_at_10 |   recall_at_20 |   dense_depth |   sparse_depth |
 |---------------:|-------------:|---------------:|--------------:|---------------:|
@@ -279,7 +279,7 @@
 |        60.0000 |       0.4747 |         0.4695 |      728.8784 |       673.1993 |
 |       100.0000 |       0.4728 |         0.4642 |      341.8643 |       300.0350 |
 
-### 固定 Top-L
+### Fixed Top-L
 
 | method        |   top_l |   ndcg_at_10 |   recall_at_20 |   complete_top20_exact_rate |
 |:--------------|--------:|-------------:|---------------:|----------------------------:|
@@ -305,7 +305,7 @@
 | proposed      |     500 |       0.4743 |         0.4691 |                      0.8862 |
 | proposed      |    1000 |       0.4747 |         0.4697 |                      0.9262 |
 
-## 鲁棒性：第二生成模型与第二 Dense 编码器
+## Robustness: alternative generator and dense encoder
 
 | condition_id   | dataset          |   original_ndcg |   proposed_ndcg |   delta_ndcg |   original_recall |   proposed_recall |   delta_recall |   dense_reduction_pct |   sparse_reduction_pct |   proposed_fallback_rate |
 |:---------------|:-----------------|----------------:|----------------:|-------------:|------------------:|------------------:|---------------:|----------------------:|-----------------------:|-------------------------:|
@@ -318,9 +318,9 @@
 | mistral        | scidocs          |          0.1799 |          0.1858 |       0.0059 |            0.2780 |            0.2988 |         0.0208 |               15.6215 |                17.0002 |                   0.0000 |
 | mistral        | webis-touche2020 |          0.3786 |          0.3890 |       0.0103 |            0.3382 |            0.3488 |         0.0106 |               47.6147 |                47.6216 |                   0.0000 |
 
-以下条件出现访问深度恶化（负百分比表示读取更多）：contriever/webis-touche2020：Dense -14.29%，Sparse -4.34%。
+Conditions with increased access depth (negative reductions indicate more reads): contriever/webis-touche2020: Dense -14.29%, Sparse -4.34%.
 
-## 规模趋势
+## Corpus scale
 
 | dataset           |   documents |   original_ndcg |   proposed_ndcg |   delta_ndcg |   original_recall |   proposed_recall |   delta_recall |   dense_reduction_pct |   sparse_reduction_pct |   proposed_fallback_rate |
 |:------------------|------------:|----------------:|----------------:|-------------:|------------------:|------------------:|---------------:|----------------------:|-----------------------:|-------------------------:|
@@ -329,7 +329,7 @@
 | trec-covid-100000 |      100000 |          0.7930 |          0.8388 |       0.0458 |            0.0416 |            0.0450 |         0.0034 |               79.8270 |                79.8391 |                   0.0000 |
 | trec-covid-171332 |      171332 |          0.7781 |          0.8224 |       0.0443 |            0.0398 |            0.0435 |         0.0037 |               74.8865 |                66.7149 |                   0.0000 |
 
-## 生成成本
+## Generation cost
 
 | dataset          | model_id                           | prompt_path                              |   records |   mean_prompt_tokens |   mean_completion_tokens |   mean_attempts |   failure_rate |
 |:-----------------|:-----------------------------------|:-----------------------------------------|----------:|---------------------:|-------------------------:|----------------:|---------------:|
@@ -366,6 +366,6 @@
 | webis-touche2020 | Qwen/Qwen2.5-7B-Instruct           | prompts/primary-reference-v1.txt         |       147 |              169.878 |                   63.735 |           1.000 |          0.000 |
 | webis-touche2020 | mistralai/Mistral-7B-Instruct-v0.3 | prompts/primary-reference-v1.txt         |       147 |              187.592 |                  126.102 |           1.000 |          0.000 |
 
-## 结论边界
+## Measurement
 
-逻辑访问深度不等同于在线延迟；生成成本、表示构造、检索执行和融合回放分别核算。完整结果保留每个数据集与失败回退记录，不以总体均值隐藏混合或负面结果。
+Access depth counts ranking entries, not wall-clock latency. Generation costs and per-dataset outcomes are reported separately.

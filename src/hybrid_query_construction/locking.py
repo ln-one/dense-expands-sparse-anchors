@@ -1,15 +1,17 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import subprocess
+import zipfile
 from datetime import UTC, datetime
 from pathlib import Path
 
 from .io import sha256_file, write_json
 
-TRACKED_LOCK_PREFIXES = ("configs/", "prompts/", "src/", "scripts/", "plan/")
+TRACKED_LOCK_PREFIXES = ("configs/", "prompts/", "src/", "scripts/", "docs/")
 HELDOUT_DATASETS = ("fiqa", "arguana", "webis-touche2020", "scidocs")
-POSTHELDOUT_MAINTENANCE = "plan/postheldout-maintenance-v1.json"
+POSTHELDOUT_MAINTENANCE = "artifacts/lock/maintenance.json"
 
 
 def _git(root: Path, *arguments: str) -> str:
@@ -143,7 +145,11 @@ def verify_lock(root: Path, lock_path: Path) -> None:
     manifest = json.loads(lock_path.read_text(encoding="utf-8"))
     approved_protocol = _approved_protocol_hashes(root, lock_path)
     for relative, expected in manifest["tracked_protocol_files"].items():
-        actual = sha256_file(root / relative)
+        if relative.startswith("plan/") and not (root / relative).exists():
+            with zipfile.ZipFile(root / "artifacts/lock/protocol-snapshot.zip") as archive:
+                actual = hashlib.sha256(archive.read(relative)).hexdigest()
+        else:
+            actual = sha256_file(root / relative)
         if actual != expected and actual != approved_protocol.get(relative):
             raise RuntimeError(f"protocol file changed after lock: {relative}")
     locked_artifacts = manifest["pre_evaluation_artifacts"]

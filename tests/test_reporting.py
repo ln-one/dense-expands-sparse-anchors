@@ -87,14 +87,14 @@ def test_report_includes_all_evaluation_datasets_in_primary_tables(tmp_path: Pat
         "proposed_vs_original",
         "proposed_vs_bridge_shared",
     }
-    assert set(classifications["classification"]) <= {"强阳性", "混合", "负面"}
+    assert set(classifications["classification"]) <= {"positive", "mixed", "negative"}
     for heading in (
-        "## 七个正式数据集主结果",
-        "## 2×2 机制实验（数据集等权）",
-        "## 公开方法完整复现",
-        "## 消融与敏感性",
-        "## 鲁棒性：第二生成模型与第二 Dense 编码器",
-        "## 规模趋势",
+        "## Results by dataset",
+        "## Factorial comparison (equal dataset weights)",
+        "## Complete baseline methods",
+        "## Ablations and sensitivity",
+        "## Robustness: alternative generator and dense encoder",
+        "## Corpus scale",
     ):
         assert heading in report
 
