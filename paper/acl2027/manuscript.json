@@ -1,0 +1,316 @@
+{
+  "paper": "DESA",
+  "sections": [
+    {
+      "markdown": "markdown/01.abstract.md",
+      "latex": "sections/00-abstract.tex"
+    },
+    {
+      "markdown": "markdown/02.introduction.md",
+      "latex": "sections/01-introduction.tex",
+      "heading_anchors": {
+        "Introduction": "sec-introduction"
+      }
+    },
+    {
+      "markdown": "markdown/03.related-work.md",
+      "latex": "sections/02-related-work.tex",
+      "heading_anchors": {
+        "Related Work": "sec-related-work",
+        "Evaluating Expansion under Hybrid Fusion": "evaluating-expansion-under-hybrid-fusion",
+        "LLM-Based Query Expansion": "llm-based-query-expansion",
+        "Retriever-Aware Expansion and Integration": "retriever-aware-expansion-and-integration"
+      }
+    },
+    {
+      "markdown": "markdown/04.method.md",
+      "latex": "sections/03-method.tex",
+      "heading_anchors": {
+        "DESA": "sec-method",
+        "Coupled Construction Overview": "coupled-construction-overview",
+        "Shared Reference Generation": "shared-reference-generation",
+        "Coupled Dense--Sparse Construction": "coupled-densesparse-construction",
+        "Orthogonal Residual Expansion": "orthogonal-residual-expansion",
+        "Score-Product Anchoring": "score-product-anchoring"
+      }
+    },
+    {
+      "markdown": "markdown/05.experiments.md",
+      "latex": "sections/04-experiments.tex",
+      "heading_anchors": {
+        "Experiments": "sec-experiments",
+        "Evaluation Protocol": "sec-quality-access",
+        "Datasets and Retrieval Setup": "datasets-and-retrieval-setup",
+        "Comparison Methods": "comparison-methods",
+        "Mechanism and Robustness Analysis": "mechanism-and-robustness-analysis",
+        "Statistical Analysis": "statistical-analysis"
+      }
+    },
+    {
+      "markdown": "markdown/06.results.md",
+      "latex": "sections/05-results.tex",
+      "heading_anchors": {
+        "Results": "sec-results",
+        "Fixed Cutoffs Alter Measured Effects": "fixed-cutoffs-alter-measured-effects",
+        "Complete-List Effectiveness and Certification Depth": "complete-list-effectiveness-and-certification-depth",
+        "Cross-Channel Coordination": "cross-channel-coordination",
+        "Comparison with Expansion and Fusion Methods": "comparison-with-expansion-and-fusion-methods",
+        "Robustness and Failure Boundary": "robustness-and-failure-boundary"
+      },
+      "layout_insertions": [
+        {
+          "before": null,
+          "latex": "\\FloatBarrier"
+        }
+      ]
+    },
+    {
+      "markdown": "markdown/07.conclusion.md",
+      "latex": "sections/06-conclusion.tex",
+      "heading_anchors": {
+        "Conclusion": "sec-conclusion"
+      }
+    },
+    {
+      "markdown": "markdown/08.limitations.md",
+      "latex": "sections/07-limitations.tex",
+      "unnumbered": true,
+      "heading_anchors": {
+        "Limitations": "limitations"
+      }
+    },
+    {
+      "markdown": "markdown/09.appendix.md",
+      "latex": "sections/a-appendix.tex",
+      "heading_anchors": {
+        "Reproducibility Details": "sec-appendix-reproducibility",
+        "Complementary Reference Generation": "complementary-reference-generation",
+        "Query Construction": "query-construction",
+        "Baseline Reproduction": "baseline-reproduction",
+        "Retrieval Implementation": "retrieval-implementation",
+        "Access-Depth Replay": "access-depth-replay",
+        "Artifact Traceability": "artifact-traceability",
+        "Operator Properties and Mechanism Diagnostics": "sec-appendix-operators",
+        "Properties of the Channel Operators": "properties-of-the-channel-operators",
+        "Mechanism Diagnostics": "sec-appendix-mechanism",
+        "Additional Experimental Results": "sec-appendix-analysis",
+        "Additional Ablations and Robustness": "sec-additional-results",
+        "Matched Operator and QuDAR Controls": "matched-operator-and-qudar-controls"
+      },
+      "layout_insertions": [
+        {
+          "before": "This section records the generation, query-construction, retrieval, and replay settings needed to reproduce the experiments.",
+          "latex": "\\raggedbottom\n\\makeatletter\n\\setlength{\\@fptop}{0pt}\n\\setlength{\\@fpsep}{12pt plus 2pt minus 2pt}\n\\setlength{\\@fpbot}{0pt plus 1fil}\n\\setlength{\\@dblfptop}{0pt}\n\\setlength{\\@dblfpsep}{12pt plus 2pt minus 2pt}\n\\setlength{\\@dblfpbot}{0pt plus 1fil}\n\\makeatother"
+        },
+        {
+          "before": "**System prompt**",
+          "latex": "\\begin{promptbox}{Prompt 1. Complementary Reference Generation}"
+        },
+        {
+          "before": "The user input is serialized as a canonical JSON object with one `query` field. XGrammar 0.2.1 requires exactly five strings; validation rejects empty, duplicate, or placeholder passages. Invalid output is retried once with the same seed and validation feedback, then falls back to the unexpanded query.",
+          "latex": "\\end{promptbox}"
+        },
+        {
+          "before": "**Confidence-weighting audit.** Replacing QuDAR's margin weights with $w_c=.25$ while holding its inputs fixed yields no significant nDCG/Recall difference ($p_{\\mathrm{Holm}}=.1182/.5826$); 92.14%/99.04% of pooled query--draw outcomes are unchanged, with dataset means in .2325--.2699. In a complete-list RRF diagnostic, the weights lower nDCG by .00117 ($p_{\\mathrm{Holm}}=.0104$), leave Recall unchanged ($p_{\\mathrm{Holm}}=.4312$), and raise depth from 5478.4 to 5601.4. Neither test shows an independent benefit in this setting; the unofficial RRF transfer does not assess LLM weighting or QuDAR overall.",
+          "latex": "\\begingroup\\footnotesize\\noindent"
+        },
+        {
+          "before": null,
+          "latex": "\\endgroup"
+        }
+      ]
+    }
+  ],
+  "assets": {
+    "../preview/fig-desa-intuition.svg": {
+      "kind": "figure",
+      "latex": "layout/fig-desa-intuition.tex",
+      "number": 1,
+      "label": "fig:desa-intuition",
+      "pdf": "figures/fig_desa_intuition.pdf",
+      "svg": "../../figures/concept/fig_desa_intuition.svg"
+    },
+    "../preview/fig-desa-overview.svg": {
+      "kind": "figure",
+      "latex": "layout/fig-desa-overview.tex",
+      "number": 2,
+      "label": "fig:desa-overview",
+      "pdf": "figures/fig_desa_overview.pdf",
+      "svg": "../../figures/concept/fig_desa_overview.svg"
+    },
+    "../preview/fig-fixed-l-diagnostics.svg": {
+      "kind": "figure",
+      "latex": "layout/fig-fixed-l-diagnostics.tex",
+      "number": 3,
+      "label": "fig:fixed-l-diagnostics",
+      "pdf": "figures/fig_fixed_top_l_diagnostics.pdf"
+    },
+    "../preview/tab-main-results.svg": {
+      "kind": "table",
+      "latex": "layout/tab-main-results.tex",
+      "number": 1,
+      "label": "tab:main-results"
+    },
+    "../preview/tab-channel-evidence.svg": {
+      "kind": "table",
+      "latex": "layout/tab-channel-evidence.tex",
+      "number": 2,
+      "label": "tab:channel-evidence"
+    },
+    "../preview/tab-fidelity.svg": {
+      "kind": "table",
+      "latex": "layout/tab-fidelity.tex",
+      "number": 3,
+      "label": "tab:fidelity"
+    },
+    "../preview/tab-mechanism-diagnostics.svg": {
+      "kind": "table",
+      "latex": "layout/tab-mechanism-diagnostics.tex",
+      "number": 4,
+      "label": "tab:mechanism-diagnostics"
+    },
+    "../preview/fig-mechanism-distributions.svg": {
+      "kind": "figure",
+      "latex": "layout/fig-mechanism-distributions.tex",
+      "number": 4,
+      "label": "fig:mechanism-distributions",
+      "pdf": "figures/fig_mechanism_distributions.pdf"
+    },
+    "../preview/tab-per-dataset-controlled.svg": {
+      "kind": "table",
+      "latex": "layout/tab-per-dataset-controlled.tex",
+      "number": 5,
+      "label": "tab:per-dataset-controlled"
+    },
+    "../preview/tab-operator-controls.svg": {
+      "kind": "table",
+      "latex": "layout/tab-operator-controls.tex",
+      "number": 6,
+      "label": "tab:operator-controls"
+    }
+  },
+  "anchors": {
+    "sec-introduction": "sec:introduction",
+    "sec-related-work": "sec:related-work",
+    "evaluating-expansion-under-hybrid-fusion": "evaluating-expansion-under-hybrid-fusion",
+    "llm-based-query-expansion": "llm-based-query-expansion",
+    "retriever-aware-expansion-and-integration": "retriever-aware-expansion-and-integration",
+    "sec-method": "sec:method",
+    "coupled-construction-overview": "coupled-construction-overview",
+    "shared-reference-generation": "shared-reference-generation",
+    "coupled-densesparse-construction": "coupled-densesparse-construction",
+    "orthogonal-residual-expansion": "orthogonal-residual-expansion",
+    "score-product-anchoring": "score-product-anchoring",
+    "sec-experiments": "sec:experiments",
+    "sec-quality-access": "sec:quality-access",
+    "datasets-and-retrieval-setup": "datasets-and-retrieval-setup",
+    "comparison-methods": "comparison-methods",
+    "mechanism-and-robustness-analysis": "mechanism-and-robustness-analysis",
+    "statistical-analysis": "statistical-analysis",
+    "sec-results": "sec:results",
+    "fixed-cutoffs-alter-measured-effects": "fixed-cutoffs-alter-measured-effects",
+    "complete-list-effectiveness-and-certification-depth": "complete-list-effectiveness-and-certification-depth",
+    "cross-channel-coordination": "cross-channel-coordination",
+    "comparison-with-expansion-and-fusion-methods": "comparison-with-expansion-and-fusion-methods",
+    "robustness-and-failure-boundary": "robustness-and-failure-boundary",
+    "sec-conclusion": "sec:conclusion",
+    "limitations": "limitations",
+    "sec-appendix-reproducibility": "sec:appendix-reproducibility",
+    "complementary-reference-generation": "complementary-reference-generation",
+    "query-construction": "query-construction",
+    "baseline-reproduction": "baseline-reproduction",
+    "retrieval-implementation": "retrieval-implementation",
+    "access-depth-replay": "access-depth-replay",
+    "artifact-traceability": "artifact-traceability",
+    "sec-appendix-operators": "sec:appendix-operators",
+    "properties-of-the-channel-operators": "properties-of-the-channel-operators",
+    "sec-appendix-mechanism": "sec:appendix-mechanism",
+    "sec-appendix-analysis": "sec:appendix-analysis",
+    "sec-additional-results": "sec:additional-results",
+    "matched-operator-and-qudar-controls": "matched-operator-and-qudar-controls"
+  },
+  "labels": {
+    "sec:introduction": "02.introduction",
+    "fig:desa-intuition": "02.introduction",
+    "sec:related-work": "03.related-work",
+    "sec:method": "04.method",
+    "fig:desa-overview": "04.method",
+    "sec:experiments": "05.experiments",
+    "sec:quality-access": "05.experiments",
+    "sec:results": "06.results",
+    "fig:fixed-l-diagnostics": "06.results",
+    "tab:main-results": "06.results",
+    "tab:channel-evidence": "06.results",
+    "tab:fidelity": "06.results",
+    "sec:conclusion": "07.conclusion",
+    "sec:appendix-reproducibility": "09.appendix",
+    "sec:appendix-operators": "09.appendix",
+    "sec:appendix-mechanism": "09.appendix",
+    "tab:mechanism-diagnostics": "09.appendix",
+    "fig:mechanism-distributions": "09.appendix",
+    "sec:appendix-analysis": "09.appendix",
+    "sec:additional-results": "09.appendix",
+    "tab:per-dataset-controlled": "09.appendix",
+    "tab:primary-tests": "09.appendix",
+    "tab:cutoff-query-diagnostics": "09.appendix",
+    "tab:operator-controls": "09.appendix"
+  },
+  "references": {
+    "../preview/fig-desa-overview.svg": {
+      "kind": "ref",
+      "label": "fig:desa-overview"
+    },
+    "05.experiments.md#Evaluation%20Protocol": {
+      "kind": "ref",
+      "label": "sec:quality-access"
+    },
+    "../preview/tab-mechanism-diagnostics.svg": {
+      "kind": "ref",
+      "label": "tab:mechanism-diagnostics"
+    },
+    "../preview/fig-mechanism-distributions.svg": {
+      "kind": "ref",
+      "label": "fig:mechanism-distributions"
+    },
+    "../preview/tab-operator-controls.svg": {
+      "kind": "ref",
+      "label": "tab:operator-controls"
+    },
+    "../preview/fig-desa-intuition.svg": {
+      "kind": "ref",
+      "label": "fig:desa-intuition"
+    },
+    "../preview/fig-fixed-l-diagnostics.svg": {
+      "kind": "ref",
+      "label": "fig:fixed-l-diagnostics"
+    },
+    "09.appendix.md": {
+      "kind": "ref",
+      "label": "tab:cutoff-query-diagnostics"
+    },
+    "../preview/tab-main-results.svg": {
+      "kind": "ref",
+      "label": "tab:main-results"
+    },
+    "../preview/tab-channel-evidence.svg": {
+      "kind": "ref",
+      "label": "tab:channel-evidence"
+    },
+    "09.appendix.md#Mechanism%20Diagnostics": {
+      "kind": "ref",
+      "label": "sec:appendix-mechanism"
+    },
+    "09.appendix.md#Additional%20Experimental%20Results": {
+      "kind": "ref",
+      "label": "sec:appendix-analysis"
+    },
+    "../preview/tab-fidelity.svg": {
+      "kind": "ref",
+      "label": "tab:fidelity"
+    },
+    "09.appendix.md#Additional%20Ablations%20and%20Robustness": {
+      "kind": "ref",
+      "label": "sec:additional-results"
+    }
+  }
+}

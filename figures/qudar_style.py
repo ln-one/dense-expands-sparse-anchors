@@ -4,15 +4,16 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 
+# Paul Tol Vibrant: https://sronpersonalpages.nl/~pault/
 COLORS = {
-    "original": "#9AA3AD",
-    "shared": "#90C8F8",
-    "dense": "#5068C8",
-    "sparse": "#A8E850",
-    "desa": "#30B088",
-    "qudar": "#98A0E0",
-    "accent": "#F0B928",
-    "negative": "#D98273",
+    "original": "#BBBBBB",
+    "shared": "#33BBEE",
+    "dense": "#EE7733",
+    "sparse": "#0077BB",
+    "desa": "#009988",
+    "qudar": "#EE3377",
+    "accent": "#009988",
+    "negative": "#CC3311",
     "ink": "#263238",
     "grid": "#D9DEE3",
 }

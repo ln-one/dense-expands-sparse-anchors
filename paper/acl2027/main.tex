@@ -17,6 +17,9 @@
 \usepackage{microtype}
 \usepackage{inconsolata}
 \usepackage{url}
+\ifdefined\ARXIVVERSION
+\usepackage{orcidlink}
+\fi
 
 \newsavebox{\promptboxcontent}
 \newenvironment{promptbox}[1]{%
@@ -44,7 +47,7 @@
 
 \ifdefined\ARXIVVERSION
 \author{
-  Chunran Zhang \\
+  Chunran Zhang\,\orcidlink{0009-0005-8865-2090} \\
   School of Computing and Artificial Intelligence \\
   Southwest Jiaotong University \\
   Chengdu, China \\
@@ -54,28 +57,12 @@
 \author{Anonymous ACL submission}
 \fi
 
+\providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
 \begin{document}
 \maketitle
 
 \begin{abstract}
-Retrieval-augmented generation (RAG) systems rely on retrieval modules to
-ground large language model (LLM) outputs. LLM-based query expansion enriches
-retrieval with document-like passages, but evaluations of hybrid retrieval
-often fuse fixed top-$L$ prefixes of dense and sparse rankings. Because $L$
-controls cross-channel contributions and ranking access, it can alter measured
-expansion gains. We therefore evaluate complete-list effectiveness and record
-per-channel replay stopping depths required to certify the ordered top-$K$.
-This changes the design: because both rankings determine the fused result,
-their query constructions should be coordinated rather than designed
-independently.
-We present DESA (Dense Expansion and Sparse Anchoring), which shares generated
-references across channels but specializes their integration. Orthogonal
-residual expansion adds new semantic directions to the dense query, whereas
-score-product anchoring reorders the original sparse support without admitting
-expansion-only matches. The same references thus play complementary roles:
-Dense expands; Sparse anchors. Across seven BEIR datasets, DESA improves
-nDCG@10 and Recall@20 over the unexpanded query by 3.82\% and 2.38\%, while
-reducing dense and sparse replay stopping depths by 36.90\% and 36.56\%.
+\input{sections/00-abstract}
 \end{abstract}
 
 \input{sections/01-introduction}

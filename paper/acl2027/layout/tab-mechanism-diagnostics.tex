@@ -1,0 +1,24 @@
+\begin{table*}[!t]
+\centering
+\small
+\setlength{\tabcolsep}{5.0pt}
+\begin{tabular}{lrrrr}
+\toprule
+Dataset & Dense angle ($^\circ$) & Sparse top-20 turnover (\%) & Relevant RR change & Support retained (\%) \\
+\midrule
+SciFact        &  9.38 & 18.88 & .0211 & 100.0000 \\
+NFCorpus       & 17.65 & 18.69 & .0147 & 100.0000 \\
+TREC-COVID     & 12.99 & 45.37 & .0021 & 100.0000 \\
+FiQA           & 13.34 & 33.91 & .0204 & 100.0000 \\
+ArguAna        &  4.02 &  8.14 & .0048 & 100.0000 \\
+Touch\'e-2020 & 14.40 & 37.07 & .0091 &  99.9999 \\
+SCIDOCS        & 12.05 & 20.98 & .0028 & 100.0000 \\
+\midrule
+Equal-dataset macro & 11.98 & 26.15 & .0107 & 100.0000 \\
+\bottomrule
+\end{tabular}
+\caption{Mechanism diagnostics computed from the frozen query constructions
+and rankings. Support retained is the mean per-query--draw fraction of the
+original sparse support; the displayed macro rounds to 100.0000\%.}
+\label{tab:mechanism-diagnostics}
+\end{table*}

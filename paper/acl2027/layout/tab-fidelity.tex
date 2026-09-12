@@ -1,0 +1,25 @@
+\begin{table}[H]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{2.4pt}
+\begin{tabular}{lrrr}
+\toprule
+Method & nDCG@10 $\uparrow$ & Recall@20 $\uparrow$ & Total depth $\downarrow$ \\
+\midrule
+\multicolumn{4}{l}{\textit{Matched references, seven datasets}} \\
+QuDAR-complete & \textbf{0.4760} & \textbf{0.4712} & \underline{5478.4} \\
+DESA         & \underline{0.4747} & \underline{0.4695} & \textbf{1402.1} \\
+\addlinespace[1pt]
+\multicolumn{4}{l}{\textit{Prior query expansion, seven datasets}} \\
+Original     & 0.4572 & 0.4586 & 3207.6 \\
+HyDE         & 0.4114 & 0.4374 & 16668.8 \\
+MuGI         & 0.4584 & 0.4596 & 2790.1 \\
+Query2doc    & \underline{0.4728} & \underline{0.4675} & \underline{1771.5} \\
+DESA         & \textbf{0.4747} & \textbf{0.4695} & \textbf{1402.1} \\
+\bottomrule
+\end{tabular}
+\caption{External comparisons over the same seven evaluation datasets. Total
+depth sums the policy-specific replay depths of all rankings used by each
+complete-list fusion target.}
+\label{tab:fidelity}
+\end{table}
