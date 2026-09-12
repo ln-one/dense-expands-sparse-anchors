@@ -1,26 +1,10 @@
+% Generated from markdown/07.conclusion.md; edit the Markdown source.
 \section{Conclusion}
+
 \label{sec:conclusion}
 
-This work frames hybrid query expansion as a coupled construction problem for
-the fused result. A fixed top-$L$ cutoff entangles expansion effects with the
-prefixes used for fusion, so we separate complete-list effectiveness from the
-per-channel depths needed to certify the same top-$K$. DESA designs both
-channels for this joint objective using shared generated references with
-channel-specific evidence authority: orthogonal residual expansion adds new
-dense semantic directions, while score-product anchoring reorders only the
-original sparse support.
+This work frames hybrid query expansion as a coupled construction problem for the fused result. A fixed top-\(L\) cutoff entangles expansion effects with the prefixes used for fusion, so we separate complete-list effectiveness from the per-channel depths needed to certify the same top-\(K\). DESA designs both channels for this joint objective using shared generated references with channel-specific evidence authority: orthogonal residual expansion adds new dense semantic directions, while score-product anchoring reorders only the original sparse support.
 
-Across seven BEIR datasets, DESA improves equal-dataset macro nDCG@10 and
-Recall@20 over Original by 3.82\% and 2.38\%, while reducing dense and sparse
-replay stopping depths by 36.90\% and 36.56\%. Under matched generated
-references, it also provides a significant nDCG advantage over Shared expansion
-and preserves the original sparse support. Against a matched complete-list
-four-signal QuDAR control, the effectiveness difference is statistically
-unresolved, while DESA requires 74.41\% less total certification depth. Sparse
-anchoring supplies the more consistent effectiveness gains, while dense
-expansion contributes additional gains on most datasets; matched controls do
-not establish either exact operator as uniquely optimal.
+Across seven BEIR datasets, DESA improves equal-dataset macro nDCG@10 and Recall@20 over Original by 3.82\% and 2.38\%, while reducing dense and sparse replay stopping depths by 36.90\% and 36.56\%. Under matched generated references, it also provides a significant nDCG advantage over Shared expansion and preserves the original sparse support. Against a matched complete-list four-signal QuDAR control, the effectiveness difference is statistically unresolved, while DESA requires 74.41\% less total certification depth. Sparse anchoring supplies the more consistent effectiveness gains, while dense expansion contributes additional gains on most datasets; matched controls do not establish either exact operator as uniquely optimal.
 
-Because the fused target depends jointly on both rankings, generated evidence
-must be coordinated across them. It may extend dense semantics without
-acquiring independent sparse admission authority: Dense expands; Sparse anchors.
+Because the fused target depends jointly on both rankings, generated evidence must be coordinated across them. It may extend dense semantics without acquiring independent sparse admission authority: Dense expands; Sparse anchors.

@@ -1,0 +1,85 @@
+\begin{table*}[!t]
+\centering
+\footnotesize
+\textbf{(a) Per-dataset controlled results}\par\smallskip
+\setlength{\tabcolsep}{2.2pt}
+\begin{tabular}{llrrrrrrr}
+\toprule
+Dataset & Method & Queries & nDCG@10 & Recall@20 & $L_D$ & $L_S$ & Sparse support & Exhaust. (\%) \\
+\midrule
+ArguAna & Original & 1406 & .3941 & .9203 & 157.1 & 156.7 & 8587.8 & 0.00 \\
+        & Shared   &      & .4004 & .9265 & 123.4 & 123.0 & 8616.8 & 0.00 \\
+        & DESA     &      & .3991 & .9237 & 133.1 & 132.7 & 8587.8 & 0.00 \\
+\addlinespace
+FiQA & Original & 648 & .3649 & .5260 & 2179.0 & 2076.3 & 28384.6 & 1.23 \\
+     & Shared   &     & .3635 & .5391 & 1104.1 & 1103.6 & 46673.3 & 0.00 \\
+     & DESA     &     & .3780 & .5450 & 1096.2 & 1065.6 & 28384.6 & 0.93 \\
+\addlinespace
+NFCorpus & Original & 323 & .3670 & .2099 & 474.4 & 173.7 & 561.5 & 48.61 \\
+         & Shared   &     & .3780 & .2260 & 359.1 & 357.6 & 3211.6 & 1.14 \\
+         & DESA     &     & .3793 & .2195 & 403.1 & 133.5 & 561.5 & 46.75 \\
+\addlinespace
+SCIDOCS & Original & 1000 & .1923 & .2721 & 694.8 & 599.3 & 11503.0 & 2.70 \\
+        & Shared   &      & .1905 & .2790 & 372.7 & 372.2 & 23239.6 & 0.00 \\
+        & DESA     &      & .1940 & .2787 & 448.8 & 387.2 & 11503.0 & 1.63 \\
+\addlinespace
+SciFact & Original & 300 & .7253 & .9036 & 409.1 & 368.6 & 2765.7 & 4.33 \\
+        & Shared   &     & .7325 & .9182 & 284.1 & 282.6 & 4489.0 & 0.33 \\
+        & DESA     &     & .7427 & .9200 & 318.3 & 291.6 & 2765.7 & 3.89 \\
+\addlinespace
+TREC-COVID & Original & 50 & .7781 & .0398 & 6270.9 & 4729.9 & 92683.8 & 2.00 \\
+           & Shared   &    & .8169 & .0433 & 787.3 & 786.9 & 141483.1 & 0.00 \\
+           & DESA     &    & .8224 & .0435 & 1574.8 & 1574.4 & 92683.8 & 0.00 \\
+\addlinespace
+Touch\'e-2020 & Original & 49 & .3786 & .3382 & 2081.8 & 2081.4 & 151619.0 & 0.00 \\
+              & Shared   &    & .3883 & .3344 & 1221.5 & 1221.3 & 284677.0 & 0.00 \\
+              & DESA     &    & .4071 & .3560 & 1127.8 & 1127.4 & 151618.9 & 0.00 \\
+\bottomrule
+\end{tabular}
+
+\medskip
+\begin{minipage}[t]{0.49\textwidth}
+\centering
+\textbf{(b) Primary statistical tests}\par\smallskip
+\setlength{\tabcolsep}{1.2pt}
+\begin{tabular}{lll}
+\toprule
+Comparison / outcome & Effect [95\% CI] & $p/p_{\mathrm{Holm}}$ \\
+\midrule
+Original / nDCG@10   & .0175 [.0111, .0238]    & .0001 / .0004 \\
+Original / Recall@20 & .0109 [.0070, .0151]    & .0001 / .0004 \\
+Original / $L_D$     & 1023.6 [377.5, 2012.6]  & .0001 / .0004 \\
+Original / $L_S$     & 781.9 [356.1, 1339.7]   & .0001 / .0004 \\
+\addlinespace
+Shared / nDCG@10     & .0075 [.0036, .0116]     & .0003 / .0012 \\
+Shared / Recall@20   & .0028 [-.0003, .0061]    & .0912 / .2736 \\
+Shared / $L_D$       & -121.4 [-367.0, 39.7]    & .3157 / .6313 \\
+Shared / $L_S$       & -66.5 [-310.6, 93.0]     & .7909 / .7909 \\
+\bottomrule
+\end{tabular}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.49\textwidth}
+\centering
+\textbf{(c) Fixed-cutoff diagnostics}\par\smallskip
+\setlength{\tabcolsep}{2.2pt}
+\begin{tabular}{rrrrrr}
+\toprule
+$L$ & Exact top-20 & \multicolumn{2}{c}{nDCG (\%)} & \multicolumn{2}{c}{Recall (\%)} \\
+ & (\%) & Change & Reverse & Change & Reverse \\
+\midrule
+20   & 1.92 & 18.23 & 8.84 & 22.50 & 3.84 \\
+50   & 16.54 & 6.95 & 3.07 & 18.84 & 3.06 \\
+100  & 47.40 & 2.17 & 0.73 & 11.74 & 0.99 \\
+1000 & 92.62 & 0.19 & 0.01 & 1.18 & 0.00 \\
+\bottomrule
+\end{tabular}
+\end{minipage}
+\caption{Additional results. (a) Dataset-level controlled results. (b)
+Stratified paired tests after within-query averaging over three generation
+draws. (c) DESA query--draw sensitivity to fixed top-$L$, macro-averaged with
+equal dataset weight; exact top-20 compares with complete-list fusion, and the
+conclusion columns compare DESA with Original.}
+\label{tab:per-dataset-controlled}
+\label{tab:primary-tests}
+\label{tab:cutoff-query-diagnostics}
+\end{table*}

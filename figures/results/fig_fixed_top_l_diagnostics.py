@@ -7,7 +7,7 @@ from pathlib import Path
 import matplotlib
 import numpy as np
 import pandas as pd
-from matplotlib.colors import ListedColormap
+from matplotlib.colors import ListedColormap, to_rgba
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
@@ -89,7 +89,7 @@ def _draw_matrix(axis: plt.Axes, values: np.ndarray, title: str) -> None:
     np.fill_diagonal(semantic_cells, 0)
     semantic_cells[0, 2] = 2
     semantic_cells[2, 0] = 2
-    cmap = ListedColormap(("#EEF1F3", "#D7F0E9", "#F4D8D2"))
+    cmap = ListedColormap([to_rgba(c, 0.16) for c in ("#BBBBBB", "#009988", "#CC3311")])
     axis.imshow(semantic_cells, cmap=cmap, vmin=0, vmax=2, aspect="equal")
 
     for row in range(3):

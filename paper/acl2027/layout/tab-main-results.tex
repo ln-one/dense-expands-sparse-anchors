@@ -1,0 +1,28 @@
+\begin{table}[H]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3.2pt}
+\begin{tabular}{lrrrr}
+\toprule
+Method & nDCG@10 $\uparrow$ & Recall@20 $\uparrow$ & $L_D\downarrow$ & $L_S\downarrow$ \\
+\midrule
+\multicolumn{5}{l}{\textit{Original query}} \\
+Original & 0.4572 & 0.4586 & 1752.4 & 1455.1 \\
+\addlinespace[1pt]
+\multicolumn{5}{l}{\textit{Shared expansion}} \\
+Shared & 0.4671 & 0.4666 & \textbf{607.4} & \textbf{606.7} \\
+\addlinespace[1pt]
+\multicolumn{5}{l}{\textit{Single-channel construction}} \\
+Dense only  & 0.4621 & 0.4637 & 1386.5 & 1219.9 \\
+Sparse only & \underline{0.4714} & \underline{0.4678} & 884.4 & 822.0 \\
+\addlinespace[1pt]
+\multicolumn{5}{l}{\textit{Channel-asymmetric construction}} \\
+DESA & \textbf{0.4747} & \textbf{0.4695} & \underline{728.9} & \underline{673.2} \\
+\bottomrule
+\end{tabular}
+\caption{Equal-dataset macro results for the seven-dataset controlled
+comparison. Higher is better for retrieval metrics; lower is better for replay
+stopping depths. Raw depths are averaged across datasets; percentage reductions
+in the text are computed within each dataset before macro-averaging.}
+\label{tab:main-results}
+\end{table}

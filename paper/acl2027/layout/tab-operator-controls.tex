@@ -1,0 +1,25 @@
+\begin{table}[H]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{2.8pt}
+\begin{tabular}{@{}lrr@{}}
+\toprule
+Construction & nDCG@10 & Recall@20 \\
+\midrule
+Original          & .4572 & .4586 \\
+Contextual Dense  & .4622 & .4637 \\
+Residual Dense    & .4621 & .4637 \\
+Rewrite Sparse    & .4686 & .4670 \\
+Product Sparse    & .4714 & .4678 \\
+\midrule
+\multicolumn{3}{l}{Paired effect (proposed $-$ control)} \\
+Dense residual, nDCG   & \multicolumn{2}{l}{$-.00005$ [$-.00086,.00082$], $p_{\mathrm{Holm}}=1.0$} \\
+Dense residual, Recall & \multicolumn{2}{l}{$-.00006$ [$-.00043,.00033$], $p_{\mathrm{Holm}}=1.0$} \\
+Sparse product, nDCG   & \multicolumn{2}{l}{$ .00283$ [$-.00126,.00693$], $p_{\mathrm{Holm}}=.3650$} \\
+Sparse product, Recall & \multicolumn{2}{l}{$ .00078$ [$-.00184,.00331$], $p_{\mathrm{Holm}}=.5689$} \\
+\bottomrule
+\end{tabular}
+\caption{Macro operator controls and query-level paired effects. Holm
+correction covers nDCG and Recall within each control pair.}
+\label{tab:operator-controls}
+\end{table}

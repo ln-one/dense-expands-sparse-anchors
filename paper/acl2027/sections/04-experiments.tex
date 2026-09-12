@@ -1,142 +1,78 @@
+% Generated from markdown/05.experiments.md; edit the Markdown source.
 \section{Experiments}
+
 \label{sec:experiments}
 
-We test cutoff sensitivity, the joint effectiveness--depth outcome, the role
-of coupled construction, and robustness across model and corpus choices.
+We test cutoff sensitivity, the joint effectiveness--depth outcome, the role of coupled construction, and robustness across model and corpus choices.
 
 \subsection{Evaluation Protocol}
+
 \label{sec:quality-access}
 
-Each method is evaluated on its complete-list fusion target. For two-channel
-methods, complete dense and sparse rankings are fused by equal-weight RRF
-\citep{cormack-etal-2009-rrf}:
+Each method is evaluated on its complete-list fusion target. For two-channel methods, complete dense and sparse rankings are fused by equal-weight RRF \citep{cormack-etal-2009-rrf}:
 
-\[
-F(d)=
+\[F(d)=
 \sum_{c\in\{D,S\}}
-\frac{1}{\kappa+\operatorname{rank}_{\pi_c}(d)}.
-\]
+\frac{1}{\kappa+\operatorname{rank}_{\pi_c}(d)}.\]
 
-A document absent from a channel contributes zero. Sorting by $F(d)$, with
-document identifiers breaking ties, defines the ordered target $T_K$. We set
-$K=20$ and evaluate effectiveness on this complete-list result.
+A document absent from a channel contributes zero. Sorting by \(F(d)\), with document identifiers breaking ties, defines the ordered target \(T_K\). We set \(K=20\) and evaluate effectiveness on this complete-list result.
 
-Bound-based replay then records how deeply each ranking must be read to certify
-$T_K$ \citep{zhang2026exact}. After revealing $L_c$ items from channel $c$, the
-next unread contribution is bounded by
+Bound-based replay then records how deeply each ranking must be read to certify \(T_K\) \citep{zhang2026exact}. After revealing \(L_c\) items from channel \(c\), the next unread contribution is bounded by
 
-\[
-u_c(L_c)=\frac{1}{\kappa+L_c+1}.
-\]
+\[u_c(L_c)=\frac{1}{\kappa+L_c+1}.\]
 
-Replay reads the channel with the larger bound, breaking ties toward Dense,
-until no unread document can change the membership or order of $T_K$. The
-stopping pair $(L_D,L_S)$ is the certification depth of that target.
+Replay reads the channel with the larger bound, breaking ties toward Dense, until no unread document can change the membership or order of \(T_K\). The stopping pair \((L_D,L_S)\) is the certification depth of that target.
 
-The matched QuDAR control uses four rankings,
-$c\in\{OS,OD,ES,ED\}$, and channel weights $w_c$:
+The matched QuDAR control uses four rankings, \(c\in\{OS,OD,ES,ED\}\), and channel weights \(w_c\):
 
-\[
-\begin{aligned}
+\[\begin{aligned}
 F(d) &= \sum_c \frac{w_c}
 {\kappa+\operatorname{rank}_{\pi_c}(d)}, \\
 u_c(L_c) &= \frac{w_c}{\kappa+L_c+1}.
-\end{aligned}
-\]
+\end{aligned}\]
 
-For QuDAR-complete, $w_c=1/4$ across the four rankings; confidence-derived
-weights are used only in the diagnostic.
-We compare QuDAR's total depth, $\sum_c L_c$, with DESA's $L_D+L_S$.
+For QuDAR-complete, \(w_c=1/4\) across the four rankings; confidence-derived weights are used only in the diagnostic. We compare QuDAR's total depth, \(\sum_c L_c\), with DESA's \(L_D+L_S\).
 
-The cutoff diagnostic instead fuses prefixes at
-$L\in\{10,20,50,100,200,500,1000\}$. For each query and draw, we label the
-change from Original as a gain, tie, or loss under fixed-$L$ and complete-list
-fusion. We report label changes, strict gain--loss reversals, and agreement with
-$T_{20}$.
+The cutoff diagnostic instead fuses prefixes at \(L\in\{10,20,50,100,200,500,1000\}\). For each query and draw, we label the change from Original as a gain, tie, or loss under fixed-\(L\) and complete-list fusion. We report label changes, strict gain--loss reversals, and agreement with \(T_{20}\).
 
-All other experiments report nDCG@10 and Recall@20
-\citep{jarvelin-kekalainen-2002-cumulated}, $(L_D,L_S)$, and the fraction of
-queries shallower in both channels. Sparse support and exhaustion diagnose
-changes in lexical access.
+All other experiments report nDCG@10 and Recall@20 \citep{jarvelin-kekalainen-2002-cumulated}, \((L_D,L_S)\), and the fraction of queries shallower in both channels. Sparse support and exhaustion diagnose changes in lexical access.
 
 \subsection{Datasets and Retrieval Setup}
 
-We evaluate seven English BEIR datasets \citep{thakur-etal-2021-beir}: SciFact
-\citep{wadden-etal-2020-fact}, NFCorpus \citep{boteva-etal-2016-fulltext},
-TREC-COVID \citep{voorhees-etal-2020-trec-covid}, FiQA
-\citep{maia-etal-2018-fiqa}, ArguAna \citep{wachsmuth-etal-2018-retrieval},
-Touch\'e-2020 \citep{bondarenko-etal-2020-touche}, and SCIDOCS
-\citep{cohan-etal-2020-specter}. They span scientific claim verification,
-biomedical and financial retrieval, argument retrieval, and scientific
-recommendation. Unless noted otherwise, all analyses use the seven datasets
-with equal macro weight.
+\label{datasets-and-retrieval-setup}
 
-The scale analysis uses nested TREC-COVID corpora of 25,000, 50,000, 100,000,
-and all documents. Each snapshot retains every judged relevant document and is
-a strict subset of the next.
+We evaluate seven English BEIR datasets \citep{thakur-etal-2021-beir}: SciFact \citep{wadden-etal-2020-fact}, NFCorpus \citep{boteva-etal-2016-fulltext}, TREC-COVID \citep{voorhees-etal-2020-trec-covid}, FiQA \citep{maia-etal-2018-fiqa}, ArguAna \citep{wachsmuth-etal-2018-retrieval}, Touché-2020 \citep{bondarenko-etal-2020-touche}, and SCIDOCS \citep{cohan-etal-2020-specter}. They span scientific claim verification, biomedical and financial retrieval, argument retrieval, and scientific recommendation. Unless noted otherwise, all analyses use the seven datasets with equal macro weight.
 
-Qwen2.5-7B-Instruct is the primary generator
-\citep{qwen-team-2024-qwen25}. Each query has three draws and five references
-per draw. Generator robustness uses Mistral-7B-Instruct-v0.3
-\citep{jiang-etal-2023-mistral} on up to 100 hash-selected queries from FiQA,
-ArguAna, Touch\'e-2020, and SCIDOCS.
+The scale analysis uses nested TREC-COVID corpora of 25,000, 50,000, 100,000, and all documents. Each snapshot retains every judged relevant document and is a strict subset of the next.
 
-Dense retrieval uses BGE-small-en-v1.5 \citep{xiao-etal-2024-cpack}; normalized
-query and document vectors are ranked by dot product. Sparse retrieval uses
-Lucene BM25 through Pyserini 2.3.0, with $k_1=0.9$ and $b=0.4$
-\citep{robertson-zaragoza-2009-bm25,lin-etal-2021-pyserini}. Contriever
-\citep{izacard-etal-2022-contriever} is the second dense encoder. Document
-identifiers break score ties.
+Qwen2.5-7B-Instruct is the primary generator \citep{qwen-team-2024-qwen25}. Each query has three draws and five references per draw. Generator robustness uses Mistral-7B-Instruct-v0.3 \citep{jiang-etal-2023-mistral} on up to 100 hash-selected queries from FiQA, ArguAna, Touché-2020, and SCIDOCS.
+
+Dense retrieval uses BGE-small-en-v1.5 \citep{xiao-etal-2024-cpack}; normalized query and document vectors are ranked by dot product. Sparse retrieval uses Lucene BM25 through Pyserini 2.3.0, with \(k_1=0.9\) and \(b=0.4\) \citep{robertson-zaragoza-2009-bm25, lin-etal-2021-pyserini}. Contriever \citep{izacard-etal-2022-contriever} is the second dense encoder. Document identifiers break score ties.
 
 \subsection{Comparison Methods}
 
-Original submits the unexpanded query to both channels. Shared expansion holds
-DESA's generated evidence fixed but applies it directly: Dense averages
-the five query--reference representations, while Sparse concatenates the query
-and references. Their comparison isolates channel-specific integration.
+\label{comparison-methods}
 
-We reproduce three expansion baselines on all seven datasets: HyDE encodes
-hypothetical documents for Dense \citep{gao-etal-2023-precise}; Query2doc
-appends a pseudo-document to the query \citep{wang-etal-2023-query2doc}; and
-MuGI pools reference representations for Dense and uses query-weighted
-concatenation for Sparse \citep{zhang-etal-2024-exploring-best}.
+Original submits the unexpanded query to both channels. Shared expansion holds DESA's generated evidence fixed but applies it directly: Dense averages the five query--reference representations, while Sparse concatenates the query and references. Their comparison isolates channel-specific integration.
 
-The matched QuDAR control combines original-sparse (OS), original-dense (OD),
-expanded-sparse (ES), and expanded-dense (ED) rankings
-\citep{kim-etal-2026-qudar}. The main comparison fuses all four complete
-rankings with uniform RRF ($\kappa=60$) and four-channel replay. The appendix reports
-the official-style Top-1000 reproduction and a diagnostic confidence-weighted
-variant.
+We reproduce three expansion baselines on all seven datasets: HyDE encodes hypothetical documents for Dense \citep{gao-etal-2023-precise}; Query2doc appends a pseudo-document to the query \citep{wang-etal-2023-query2doc}; and MuGI pools reference representations for Dense and uses query-weighted concatenation for Sparse \citep{zhang-etal-2024-exploring-best}.
+
+The matched QuDAR control combines original-sparse (OS), original-dense (OD), expanded-sparse (ES), and expanded-dense (ED) rankings \citep{kim-etal-2026-qudar}. The main comparison fuses all four complete rankings with uniform RRF (\(\kappa=60\)) and four-channel replay. The appendix reports the official-style Top-1000 reproduction and a diagnostic confidence-weighted variant.
 
 \subsection{Mechanism and Robustness Analysis}
 
-A $2\times2$ comparison covers Original, each operator alone, and DESA.
-Matched controls isolate the operators. For Dense, the Original sparse ranking
-is paired with unprojected contextual or orthogonal residual expansion. For
-Sparse, the Original dense ranking is paired with direct rewriting or
-score-product anchoring.
+\label{mechanism-and-robustness-analysis}
 
-Dense behavior is measured by the angle between original and expanded query
-vectors. Sparse behavior is measured by top-20 turnover and relevant-document
-rank movement. Within-dataset quartiles and Spearman correlations relate these
-quantities to effectiveness and certification depth.
+A \(2\times2\) comparison covers Original, each operator alone, and DESA. Matched controls isolate the operators. For Dense, the Original sparse ranking is paired with unprojected contextual or orthogonal residual expansion. For Sparse, the Original dense ranking is paired with direct rewriting or score-product anchoring.
 
-Further controls vary the reference count over $\{1,3,5\}$, compare
-score-product anchoring with a support-preserving binary mask, and use generated
-passages alone for Sparse. Robustness analyses vary
-$\kappa\in\{2,20,60,100\}$, the generator, the dense encoder, and corpus size.
+Dense behavior is measured by the angle between original and expanded query vectors. Sparse behavior is measured by top-20 turnover and relevant-document rank movement. Within-dataset quartiles and Spearman correlations relate these quantities to effectiveness and certification depth.
+
+Further controls vary the reference count over \(\{1,3,5\}\), compare score-product anchoring with a support-preserving binary mask, and use generated passages alone for Sparse. Robustness analyses vary \(\kappa\in\{2,20,60,100\}\), the generator, the dense encoder, and corpus size.
 
 \subsection{Statistical Analysis}
 
-We average the three draws within each query before aggregation and report both
-per-dataset results and equal-dataset macro averages. The 95\% confidence
-intervals use 10,000 stratified bootstrap samples, resampling queries within
-each dataset.
+\label{statistical-analysis}
 
-The primary comparisons are DESA against Original and Shared expansion. We use
-10,000 stratified paired sign-flip randomizations and apply Holm correction
-across nDCG@10, Recall@20, $L_D$, and $L_S$ for each comparator. Operator
-controls use the same draw-averaged, query-level procedure. For the
-post-held-out QuDAR controls, we use the same paired test. Holm correction is
-applied separately to the two effectiveness metrics and the two total-depth
-comparisons; total-depth reductions also receive bootstrap intervals.
+We average the three draws within each query before aggregation and report both per-dataset results and equal-dataset macro averages. The 95\% confidence intervals use 10,000 stratified bootstrap samples, resampling queries within each dataset.
+
+The primary comparisons are DESA against Original and Shared expansion. We use 10,000 stratified paired sign-flip randomizations and apply Holm correction across nDCG@10, Recall@20, \(L_D\), and \(L_S\) for each comparator. Operator controls use the same draw-averaged, query-level procedure. For the post-held-out QuDAR controls, we use the same paired test. Holm correction is applied separately to the two effectiveness metrics and the two total-depth comparisons; total-depth reductions also receive bootstrap intervals.
