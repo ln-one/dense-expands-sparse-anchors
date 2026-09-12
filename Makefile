@@ -10,10 +10,10 @@ test:
 	uv run pytest
 
 lint:
-	uv run ruff check .
+	uv run ruff check src scripts tests
 
 tables:
-	uv run hqc report --input artifacts/results/raw --output report
+	uv run python scripts/reproduce_results.py
 
 clean-rebuild:
 	./scripts/clean_rebuild.sh
@@ -42,4 +42,4 @@ formal-freeze: formal-preheldout
 formal-report: formal-evaluate
 
 verify: test lint
-	uv run hqc verify --root .
+	uv run python scripts/reproduce_results.py

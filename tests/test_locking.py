@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import sqlite3
+import zipfile
 from pathlib import Path
 
 import pytest
@@ -9,6 +11,24 @@ import pytest
 from hybrid_query_construction.io import sha256_file, write_json
 from hybrid_query_construction.locking import verify_lock
 from hybrid_query_construction.storage import RankingStore, ranking_store_digest
+
+
+def test_archived_protocol_keeps_original_hash_validation(tmp_path: Path) -> None:
+    lock_path, _ = _fixture_lock(tmp_path)
+    content = b"Frozen protocol\n"
+    manifest = json.loads(lock_path.read_text())
+    manifest["tracked_protocol_files"] = {
+        "plan/experiment-protocol.md": hashlib.sha256(content).hexdigest()
+    }
+    write_json(lock_path, manifest)
+    snapshot = tmp_path / "artifacts/lock/protocol-snapshot.zip"
+    with zipfile.ZipFile(snapshot, "w") as archive:
+        archive.writestr("plan/experiment-protocol.md", content)
+    verify_lock(tmp_path, lock_path)
+    with zipfile.ZipFile(snapshot, "w") as archive:
+        archive.writestr("plan/experiment-protocol.md", b"Changed protocol\n")
+    with pytest.raises(RuntimeError, match="protocol file changed after lock"):
+        verify_lock(tmp_path, lock_path)
 
 
 def _fixture_lock(root: Path) -> tuple[Path, Path]:

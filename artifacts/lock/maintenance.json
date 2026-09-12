@@ -1,0 +1,15 @@
+{
+  "approved_protocol_file_sha256": {
+    "plan/project-overview.md": "416703b7fe94259f9aa9525c5390f6872f04c0b4f4e947a9b1df74a85aba4821",
+    "plan/progress.md": "892418b00362619cf85eb8deb5ea91cd9d62cca84e2a7590459cf858e1fab841",
+    "plan/review/method-experiment-traceability.md": "cd9e9827aa0f40bac14929772a964b29161573e02b036b5ef586f02214ff7c30",
+    "src/hybrid_query_construction/locking.py": "adbc18e396ba96d2e33bd233b907de3652ff452c332f6906c12ef5d293d900bb",
+    "src/hybrid_query_construction/reporting.py": "8c7a2252c4050b8b2cb64b9adc1a6ea8680f6da4377cc0876d585d95323bdd53",
+    "src/hybrid_query_construction/verification.py": "de92eb7beddf568afaa84c08bcfe0e85686777e1c819af4b8cf0691a87aae25c",
+    "scripts/clean_rebuild.sh": "b079038f3c09f963c75033f3e7480942b780a77bce56aafce1610146911d69a0"
+  },
+  "frozen_experiment_commit": "ec605a35a22693b65ca98f7448ca2954ea6bcfed",
+  "preheldout_lock_sha256": "74950b9c8103c1997581effc59e565ec1b92488d7f880a5aee4a44f48c9608df",
+  "reason": "Repository maintenance: English report labels, archived frozen protocol documents, and public table reproduction from released query means. Retrieval, generation, evaluation, numeric results, and the original lock are unchanged.",
+  "schema_version": 1
+}

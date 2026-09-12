@@ -26,3 +26,6 @@ figures/candidates/
 figures/data/candidates/
 paper/acl2027/output/preprint/
 paper/acl2027/output/pdf/dense-expands-sparse-anchors-preprint.pdf
+
+!artifacts/lock/maintenance.json
+!artifacts/lock/pre-heldout-v1.json

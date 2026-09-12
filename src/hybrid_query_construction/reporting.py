@@ -296,16 +296,17 @@ def _classify_primary_outcomes(tests: pd.DataFrame) -> pd.DataFrame:
     rows: list[dict[str, object]] = []
     for comparison, data in tests.groupby("comparison", sort=True):
         if (data["ci95_lower"] > 0.0).all():
-            label = "强阳性"
+            label = "positive"
         elif (data["ci95_upper"] < 0.0).all():
-            label = "负面"
+            label = "negative"
         else:
-            label = "混合"
+            label = "mixed"
         rows.append(
             {
                 "comparison": comparison,
                 "classification": label,
-                "rule": "四项有利差值的95%区间同向，否则为混合",
+                "rule": ("All four favorable differences have same-sign 95% intervals; "
+                         "otherwise mixed"),
             }
         )
     return pd.DataFrame(rows)
@@ -401,7 +402,7 @@ def _plot_scale_trends(summary: pd.DataFrame, output: Path) -> None:
 
 def _markdown_or_empty(frame: pd.DataFrame, *, floatfmt: str = ".4f") -> str:
     if frame.empty:
-        return "该实验轨道无记录。"
+        return "No records for this track."
     return frame.to_markdown(index=False, floatfmt=floatfmt)
 
 
@@ -658,17 +659,20 @@ def build_report(
         | (robustness_pairs["sparse_reduction_pct"] < 0.0)
     ] if not robustness_pairs.empty else robustness_pairs
     if negative_robustness.empty:
-        negative_robustness_text = "未观察到 Proposed 相对 Original 的访问深度恶化。"
+        negative_robustness_text = (
+            "Proposed does not increase access depth over Original in these conditions."
+        )
     else:
         cells = [
             (
-                f"{row.condition_id}/{row.dataset}：Dense {row.dense_reduction_pct:.2f}%，"
+                f"{row.condition_id}/{row.dataset}: Dense {row.dense_reduction_pct:.2f}%, "
                 f"Sparse {row.sparse_reduction_pct:.2f}%"
             )
             for row in negative_robustness.itertuples(index=False)
         ]
         negative_robustness_text = (
-            "以下条件出现访问深度恶化（负百分比表示读取更多）：" + "；".join(cells) + "。"
+            "Conditions with increased access depth (negative reductions indicate more reads): "
+            + "; ".join(cells) + "."
         )
 
     scale = summary[
@@ -686,102 +690,104 @@ def build_report(
 
     unique_queries = query_means[["dataset", "query_id"]].drop_duplicates().shape[0]
     lines = [
-        "# 正式实验结果报告",
+        "# Experiment results",
         "",
         (
-            "> 本报告只读取真实逐查询记录；七个正式数据集等权汇总，"
-            "鲁棒性与规模实验按 track 单独报告。"
+            "> Results use per-query records and equal weighting across the seven datasets. "
+            "Robustness and scale experiments are reported separately."
         ),
         "",
-        "## 数据完整性",
+        "## Records",
         "",
-        f"- 逐查询×方法×生成重复结果：{len(frame):,} 条",
-        f"- 独立查询单元：{unique_queries:,} 条",
-        f"- 数据集：{frame['dataset'].nunique()} 个",
-        f"- 方法：{frame['method'].nunique()} 个",
-        f"- 生成失败回退率：{frame['fallback'].mean():.4%}",
+        f"- Query–method–draw records: {len(frame):,}",
+        f"- Distinct queries: {unique_queries:,}",
+        f"- Datasets: {frame['dataset'].nunique()}",
+        f"- Methods: {frame['method'].nunique()}",
+        f"- Generation fallback rate: {frame['fallback'].mean():.4%}",
         "",
-        "## Controlled 主结果（数据集等权）",
+        "## Controlled results (equal dataset weights)",
         "",
         macro.to_markdown(index=False, floatfmt=".4f"),
         "",
-        "### 主结果的查询级分层 bootstrap 95% 区间",
+        "### Stratified query bootstrap: 95% intervals",
         "",
         method_intervals.to_markdown(index=False, floatfmt=".4f"),
         "",
-        "## 七个正式数据集主结果",
+        "## Results by dataset",
         "",
         _markdown_or_empty(main_dataset_table),
         "",
-        "## 2×2 机制实验（数据集等权）",
+        "## Factorial comparison (equal dataset weights)",
         "",
         _markdown_or_empty(mechanism_macro),
         "",
-        "## 相对 Original 的访问变化",
+        "## Access changes relative to Original",
         "",
         access.to_markdown(index=False, floatfmt=".3f"),
         "",
-        "### 数据集等权访问变化及 95% 区间",
+        "### Macro access changes and 95% intervals",
         "",
         access_intervals.to_markdown(index=False, floatfmt=".4f"),
         "",
-        "## 主比较",
+        "## Primary comparisons",
         "",
         tests.to_markdown(index=False, floatfmt=".6f"),
         "",
-        "### 结论分类",
+        "### Outcome classification",
         "",
         classifications.to_markdown(index=False),
         "",
-        "## 公开方法完整复现",
+        "## Complete baseline methods",
         "",
         (
-            "下表将各论文对应的提示词与整合规则同冻结的 Original 和 Proposed "
-            "并列展示；该表为描述性完整方法比较，预注册显著性检验仍只针对 "
-            "controlled 主比较。"
+            "Each baseline uses its paper-specific prompt and integration rule. "
+            "These descriptive comparisons accompany Original and Proposed; "
+            "registered tests cover "
+            "the controlled primary comparisons."
         ),
         "",
         _markdown_or_empty(complete_method_comparison),
         "",
-        "## 消融与敏感性",
+        "## Ablations and sensitivity",
         "",
-        "### 参考文本数量",
+        "### Reference count",
         "",
         _markdown_or_empty(reference_macro),
         "",
-        "### Sparse 算子",
+        "### Sparse operator",
         "",
         _markdown_or_empty(sparse_operator_macro),
         "",
-        "### RRF 常数",
+        "### RRF constant",
         "",
         _markdown_or_empty(rrf_macro),
         "",
-        "### 固定 Top-L",
+        "### Fixed Top-L",
         "",
         _markdown_or_empty(fixed_macro),
         "",
-        "## 鲁棒性：第二生成模型与第二 Dense 编码器",
+        "## Robustness: alternative generator and dense encoder",
         "",
         _markdown_or_empty(robustness_pairs),
         "",
         negative_robustness_text,
         "",
-        "## 规模趋势",
+        "## Corpus scale",
         "",
         _markdown_or_empty(scale_pairs),
         "",
-        "## 生成成本",
+        "## Generation cost",
         "",
         (
             generation_summary.to_markdown(index=False, floatfmt=".3f")
             if not generation_summary.empty
-            else "尚无可汇总的生成记录。"
+            else "No generation records available."
         ),
         "",
-        "## 结论边界",
+        "## Measurement",
         "",
-        "逻辑访问深度不等同于在线延迟；生成成本、表示构造、检索执行和融合回放分别核算。完整结果保留每个数据集与失败回退记录，不以总体均值隐藏混合或负面结果。",
+        ("Access depth counts ranking entries, not wall-clock latency. "
+         "Generation costs and per-dataset outcomes are reported separately."),
     ]
     report_path = output_directory / "REPORT.md"
     atomic_write_text(report_path, "\n".join(lines) + "\n")

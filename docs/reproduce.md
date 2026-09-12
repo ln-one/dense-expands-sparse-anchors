@@ -1,4 +1,22 @@
-# Formal execution runbook
+# Reproduction
+
+## Released results
+
+```sh
+make setup
+make tiny
+make tables
+```
+
+`make tables` rebuilds and verifies 13 tables from `report/per-query-draw-mean.csv`,
+including primary effects, confidence intervals, and paired tests. Outputs are
+written to `tmp/reproduced-tables/`. This requires no models or ranking stores.
+The CSV contains per-query means over generation draws, not individual generations.
+
+The remaining sections describe full generation and retrieval. Full result JSONs,
+model weights, and ranking stores are external artifacts. Some local raw result
+files are unavailable; a fresh clone does not include a complete raw-run bundle.
+Do not rebuild the reference report from a partial collection of JSON files.
 
 This runbook is the executable boundary for `hqc-formal-v1`. Commands are run from
 the repository root. Re-running generation skips completed query/draw records.
@@ -15,6 +33,10 @@ command additionally runs `uv run hqc progress --require-complete`; incomplete o
 cross-commit generation and ranking artifacts cannot pass the held-out gate.
 
 ## 0. Environment and compatibility gate
+
+A fresh full run creates its own lock. The original experiment lock refers to
+commit `ec605a35a22693b65ca98f7448ca2954ea6bcfed`; subsequent comparison methods
+use later code. See [experiment provenance](../artifacts/lock/README.md).
 
 ```bash
 make setup
@@ -173,6 +195,24 @@ make verify
 make clean-rebuild
 ```
 
-The clean-room check creates a fresh environment from `uv.lock`, rebuilds `report/`
-only from the locked per-query records, and compares the rebuilt directory byte for
-byte with the reference report.
+The clean-room check creates a fresh environment from `uv.lock` and verifies the
+13 tables rebuilt from released per-query draw means, using a numerical tolerance
+of 1e-10. It does not require original model or ranking artifacts.
+
+
+## Supplementary analyses
+
+After the ranking stores and generation records are available:
+
+```sh
+uv run python scripts/run_mechanism_analysis.py
+uv run python scripts/run_evidence_strengthening.py
+uv run python scripts/run_qudar_depth.py
+uv run python scripts/run_qudar_confidence.py
+uv run python scripts/run_anchorqe_dense_comparison.py
+uv run python scripts/run_anchorqe_dense_comparison.py --stream-calibrated
+```
+
+These commands produce the mechanism, operator-control, QUDAR, and AnchorQE
+records in `report/`. They require the full retrieval artifacts; `make tables`
+only regenerates the core report from included per-query results.
